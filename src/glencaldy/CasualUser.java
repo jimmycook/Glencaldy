@@ -10,6 +10,14 @@ public class CasualUser extends User{
 	CasualUser(String userID, String password, String firstname, String surname) {
 		super(userID, password, firstname, surname);
 	}
+	
+	CasualUser(String userID, String password, String firstname, String surname, String address, String town, String postcode, String dateOfBirth) {
+		super(userID, password, firstname, surname);
+		this.address = address;
+		this.town = town;
+		this.postcode = postcode;
+		this.dateOfBirth = dateOfBirth;
+	}
 
 	public String getDateOfBirth() {
 		return dateOfBirth;

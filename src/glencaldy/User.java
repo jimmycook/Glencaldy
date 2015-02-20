@@ -10,7 +10,8 @@ import java.util.ArrayList;
  */
 public abstract class User {
 	
-	
+	private static int nextUID = 1001;
+	private String username;
 	private String userID;
 	private String password;
 	private String firstname;
@@ -19,7 +20,8 @@ public abstract class User {
 	private ArrayList<LoginRecord> loginRecords = new ArrayList<LoginRecord>();
 	
 	User(String userID, String password, String firstname, String surname){
-		this.userID = userID;
+		this.userID = String.valueOf(User.getNextUID());
+		this.username = userID;
 		this.password = password;
 		this.firstname = firstname;
 		this.surname = surname;
@@ -68,5 +70,19 @@ public abstract class User {
 	public void setFirstname(String firstname) {
 		this.firstname = firstname;
 	}
+
+	public static int getNextUID() {
+		return nextUID++;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+
 
 }

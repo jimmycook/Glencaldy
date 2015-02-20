@@ -3,6 +3,7 @@ package glencaldy;
 import java.util.ArrayList;
 
 public class StaffMember extends User{
+	private static int nextID;
 	
 	private String staffID;
 	private String staffEmail;
@@ -98,6 +99,10 @@ public class StaffMember extends User{
 
 	public void setTelephoneExtension(String telephoneExtension) {
 		this.telephoneExtension = telephoneExtension;
+	}
+
+	public static String getNextID() {
+		return String.valueOf(nextID++);
 	}
 
 }
