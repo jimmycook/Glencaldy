@@ -46,7 +46,15 @@ public abstract class User {
 	public String getUserID(){
 		return userID;
 	}
+		
+	public String getPassword(){
+		return password;
+	}
 	
+	public void setPassword(String password){
+		this.password = password;
+	}
+		
 	public LoginRecord getLastLogin() {
 		return lastLogin;
 	}
@@ -82,6 +90,7 @@ public abstract class User {
 	public void setUsername(String username) {
 		this.username = username;
 	}
+
 
 
 
