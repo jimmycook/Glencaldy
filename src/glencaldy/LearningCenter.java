@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-
 import java.util.Iterator;
 
 public class LearningCenter {
@@ -13,34 +12,76 @@ public class LearningCenter {
 	private ArrayList<Stock> allStock = new ArrayList<Stock>();
 	private ArrayList<LoginRecord> allLogins = new ArrayList<LoginRecord>();
 	private InputStreamReader converter = new InputStreamReader(System.in);
+	boolean logout = false;
+
 	User activeUser = null;
 	LoginRecord activeLogin = null;
 	BufferedReader in = new BufferedReader(converter);
 	
 	LearningCenter(){
-		boolean logout = false;
-		
+		boolean quit = false;
 		System.out.println("Controller starting\n\n");
 		
 		populateUsers();
 		
-		welcomeMessage();
-		
-		while(activeUser == null){
-			activeUser = login();
+		do{
+			welcomeMessage();
+			
+			loginMenu();
+			
+			
+			
+			while(!logout)
+			{
+				getMenu();
+			}
+
+			logout();
 		}
-		
-		activeLogin = new LoginRecord(activeUser.getUserID());
-		allLogins.add(activeLogin);
-		while(!logout)
-		{
-			getMenu();
-		}
-		
-		logout();
+		while(!quit);
 	}
 	
 	
+	private void loginMenu() {
+		String input = null;
+		boolean quit = false;
+		do{
+			System.out.println("Login Menu");
+			System.out.println("----------------");
+			System.out.println("1. Login");
+			System.out.println("0. Quit");
+			System.out.println("\nEnter an option");
+			
+			try{
+				input = in.readLine();
+			}
+			catch (IOException e){
+					System.err.println("Error : " + e);
+			}
+			
+			
+			switch (input){ 
+			case "1":
+				activeUser = null;
+				activeUser = login();
+				
+				if(activeUser != null){
+					activeLogin = new LoginRecord(activeUser.getUserID());
+					allLogins.add(activeLogin);
+				}				
+				break;
+			case "0":
+				quit = true;
+				break;
+			default:
+				System.out.println("Please enter a valid option");
+				break;
+			}
+		}
+		while(!quit);
+	}
+
+
 	private void logout() {
 		
 	}
@@ -64,8 +105,8 @@ public class LearningCenter {
 	}
 	
 	private void fullMenu() {
-		int input = null;
-		
+		String input = null;
+		boolean quit = false;
 		do{
 			System.out.println("Full Menu");
 			System.out.println("----------------");
@@ -76,7 +117,7 @@ public class LearningCenter {
 			System.out.println("\nEnter an option");
 			
 			try{
-				String tempInput = in.readLine();
+				input = in.readLine();
 			}
 			catch (IOException e){
 					System.err.println("Error : " + e);
@@ -84,20 +125,25 @@ public class LearningCenter {
 			
 			
 			switch (input){ 
-			case 1:
+			case "1":
 				viewCatalogue();
 				break;
-			case 2:
+			case "2":
 				changePassword();
 				break;
-			case 3:
+			case "3":
 				requestReservation();
+				break;
+			case "0":
+				this.logout = true;
+				quit = true;
+				break;
+			default:
+				System.out.println("Please enter a valid option");
 				break;
 			}
 		}
-		while(input != 0);
-		
-		
+		while(!quit);
 	}
 
 
