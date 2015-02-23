@@ -40,4 +40,9 @@ public class Reservation {
 	public void setTimestamp(Timestamp timestamp) {
 		this.timestamp = timestamp;
 	}
+	
+	public String toString(){
+		return "Reservation ID\t: " + reservationID +
+				"\nStock ID\t:" + stockID; 
+	}
 }

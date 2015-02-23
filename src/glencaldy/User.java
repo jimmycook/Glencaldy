@@ -90,8 +90,12 @@ public abstract class User {
 	public void setUsername(String username) {
 		this.username = username;
 	}
-
-
-
-
+	
+	/**
+	 * purely for inheritance 
+	 * @return null
+	 */
+	public ArrayList<Reservation> getUserReservations() {
+		return null;
+	}
 }

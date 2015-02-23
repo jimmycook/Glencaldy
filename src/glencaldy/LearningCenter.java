@@ -6,6 +6,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+/**
+ * Controller class for the Glencaldy Learning Center CLI
+ * 
+ * @author jimmycook
+ *
+ */
 public class LearningCenter {
 	
 	private ArrayList<User> allUsers = new ArrayList<User>();
@@ -43,7 +49,11 @@ public class LearningCenter {
 		
 	}
 	
-	
+	/**
+	 * Menu for logging in to the system
+	 * Sets this.activeUser
+	 * @return boolean based on the login success
+	 */
 	private boolean loginMenu() {
 		String input = null;
 		boolean quit = false;
@@ -83,14 +93,19 @@ public class LearningCenter {
 		return false;
 	}
 
-
+	/**
+	 * Logs the current user out and serialises the allUsers ArrayList
+	 * 
+	 * @return void
+	 */
 	private void logout() {
 		this.activeUser = null;
 	}
 
 
-	/*
-	 * Gets the menu for the correct type of user 
+	/**
+	 * displays the right type of menu for the users that is currently logged in
+	 * @return void
 	 */
 	private void getMenu(){
 		String userType = activeUser.getClass().getName();
@@ -106,8 +121,9 @@ public class LearningCenter {
 		}
 	}
 	
-	/*
-	 * Displays a menu for users that can borrow items
+	/**
+	 * Displays the full menu of options for a staffmember or a fullmember user
+	 * @return void
 	 */
 	private void fullMenu() {
 		String input = null;
@@ -117,9 +133,9 @@ public class LearningCenter {
 			System.out.println("----------------");
 			System.out.println("1. View Stock Catalogue");
 			System.out.println("2. Change Password");
-			System.out.println("3. Request Reservation");
-			System.out.println("4. Check your fines");
-
+			System.out.println("3. Request a Reservation");
+			System.out.println("4. Show your Reservations");
+			System.out.println("5. Check your fines");
 			System.out.println("0. Logout");
 			System.out.println("\nEnter an option");
 			
@@ -141,7 +157,10 @@ public class LearningCenter {
 			case "3":
 				requestReservation();
 				break;
-			case "4": 
+			case "4":
+				showReservations();
+				break;
+			case "5": 
 				checkFines(activeUser.getUserID());
 				break;
 			case "0":
@@ -156,15 +175,109 @@ public class LearningCenter {
 		while(!quit);
 	}
 
-
-	/*
-	 * Checks if there are any fines tied to a user
+	/**
+	 * Shows all the fines a user may have, works off of a userID rather than a user object
+	 * @param userID
 	 */
 	private void checkFines(String userID) {
-		// TODO Auto-generated method stub
 		
 	}
+	
+	/**
+	 * Users a userID to return a user object from the users ArrayList
+	 * @param String userID
+	 * @return User
+	 */
+	private User getUserByID(String userID){
+		
+		Iterator<User> uIt = allUsers.iterator();
+		
+		while(uIt.hasNext()){
+			User curUser = uIt.next();
+			
+			if(userID == curUser.getUserID()){
+				return curUser;
+			}
+		}
 
+		return null;
+	}
+	
+	/**
+	 * Provides the subclass name of a user object
+	 * @param user 
+	 * @return user type as string
+	 */
+	private String getUserType(User user){
+		String userType = user.getClass().getName();
+		
+		if(userType.equals("glencaldy.FullMember")){
+			return  "FullMember";
+		}
+		else if(userType.equals("glencaldy.StaffMember")){
+			return "StaffMember";
+		}
+		else if(userType.equals("glencaldy.Administrator")){
+			return "Administrator";
+		}
+		else if(userType.equals("glencaldy.CasualUser")){
+			return "CasualUser";
+		}
+		
+		return "User";
+		
+	}
+	
+	/**
+	 * Gets all the reservations from a user, if they have any
+	 * @param user
+	 */
+	private void showReservations(User user){
+		if(activeUser.getUserReservations() == null){
+			System.out.println("-------------------------");
+			System.out.println("User has no reservations." + activeUser.getUsername());
+			System.out.println("-------------------------");
+		}
+		else{
+			Iterator<Reservation> it = user.getUserReservations().iterator();
+			System.out.println("-------------------------");
+			System.out.println("Reservations for " + user.getUsername());
+			System.out.println("-------------------------");
+			while(it.hasNext()){
+				Reservation cur = it.next();
+				System.out.println(cur.toString());
+				System.out.println("----------------");	
+			}	
+		}
+	}
+	
+	/**
+	 * Overloaded showReservations(User user) to run off of the active user instead
+	 */
+	private void showReservations(){
+		if(activeUser.getUserReservations() == null){
+			System.out.println("-------------------------");
+			System.out.println("User has no reservations.");
+			System.out.println("-------------------------");
+		}
+		else{
+			Iterator<Reservation> it = activeUser.getUserReservations().iterator();
+
+			System.out.println("-------------------------");
+			System.out.println("Reservations for " + activeUser.getUsername());
+			System.out.println("-------------------------");
+			while(it.hasNext()){
+				Reservation cur = it.next();
+				System.out.println(cur.toString());
+				System.out.println("----------------");	
+			}	
+		}
+		
+	}
+	
+	/**
+	 * Allows a full or staff member to create a reservation on an item
+	 */
 	private void requestReservation() {
 		String input = null;
 		boolean quit = false;
@@ -192,12 +305,9 @@ public class LearningCenter {
 							System.out.println("Reserve this item? (y for yes, to cancel enter anything else)");
 							
 							if(in.readLine().equals("y")){
-								if(activeUser.getClass().getName() == "glencaldy.FullMember"){
-									((FullMember) activeUser).getUserReservations().add(new Reservation(input));
-								}
-								else if(activeUser.getClass().getName() == "glencaldy.StaffMember"){
-									((StaffMember) activeUser).getUserReservations().add(new Reservation(input));
-								}
+								
+								activeUser.getUserReservations().add(new Reservation(input));
+								
 								
 								System.out.println("Reservation created\n");
 								
@@ -222,8 +332,9 @@ public class LearningCenter {
 		while(!quit);
 	}
 
-	/*
-	 * changes the password for the login user, requires password confirmation
+	
+	/**
+	 * Changes the password for the login user, requires password confirmation
 	 */
 	private void changePassword() {
 		String oldPassword = null;
@@ -298,6 +409,10 @@ public class LearningCenter {
 		}	
 	}
 
+	
+	/**
+	 * Admin menu for Administrator users only
+	 */
 	private void adminMenu() {
 		
 	}
@@ -308,7 +423,7 @@ public class LearningCenter {
 	}
 
 
-	/*
+	/**
 	 * Login - asks the user for a username and password until they are successfully logged in to the system
 	 * 
 	 * @return User if login was successful returns the user object, otherwise returns null
@@ -367,12 +482,18 @@ public class LearningCenter {
 		
 	}
 	
+	/**
+	 * Welcome message for the system
+	 */
 	public void welcomeMessage(){
 		System.out.println("--------------------------------------\n");
 		System.out.println("Welcome to Glencaldy Learning Center\n");
 		System.out.println("--------------------------------------\n");
 	}
 	
+	/**
+	 * Populates the all users ArrayList
+	 */
 	public void populateUsers(){
 		allUsers.add(
 				new CasualUser("casualuser", "password", "John", "Doe", "44 Big Street", "Big Town", 
@@ -391,6 +512,9 @@ public class LearningCenter {
 				);
 	}
 	
+	/**
+	 * Populates the allStock ArrayList
+	 */
 	public void populateStock(){
 		allStock.add(new CD("Sonic Highways", 7.99, "Sony",
 				40, "Normal", "Audio", "Foo Fighters"));
@@ -401,6 +525,5 @@ public class LearningCenter {
 		allStock.add(new Journal("Some Journal", 2.5, "Oxford",
 				"Science", "123456789", 240 , "Issue 2", "1/1/2000"));
 	}
-	
 	
 }
