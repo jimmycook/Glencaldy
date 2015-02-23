@@ -120,6 +120,21 @@ public class LearningCenter {
 			fullMenu();
 		}
 	}
+	/**
+	 * Admin menu for Administrator users only
+	 * @return void
+	 */
+	private void adminMenu() {
+		
+	}
+
+	/**
+	 * Menu for CasualUsers
+	 * @return void
+	 */
+	private void casualMenu() {
+		
+	}
 	
 	/**
 	 * Displays the full menu of options for a staffmember or a fullmember user
@@ -410,17 +425,6 @@ public class LearningCenter {
 	}
 
 	
-	/**
-	 * Admin menu for Administrator users only
-	 */
-	private void adminMenu() {
-		
-	}
-
-
-	private void casualMenu() {
-		
-	}
 
 
 	/**
