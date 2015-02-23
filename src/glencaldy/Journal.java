@@ -18,6 +18,13 @@ public class Journal extends Publication {
 		this.setIssueNum(issueNum);
 		
 	}
+	
+	Journal(String title, double cost, String publisher,
+			String subjectArea, String serialNum, int numPages, String issueNum, String dateOfIssue) {
+		super(title, cost, publisher, subjectArea, serialNum, numPages);
+		this.setDateOfIssue(dateOfIssue);
+		this.setIssueNum(issueNum);
+	}
 
 	public String getIssueNum() {
 		return issueNum;
@@ -33,6 +40,12 @@ public class Journal extends Publication {
 
 	public void setDateOfIssue(String dateOfIssue) {
 		this.dateOfIssue = dateOfIssue;
+	}
+	
+	public String toString(){
+		return super.toString() +
+				"\nIssue Number\t: " + issueNum +
+				"\nDate of issue\t: " + dateOfIssue;
 	}
 
 }

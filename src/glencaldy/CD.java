@@ -16,6 +16,13 @@ public class CD extends Digital {
 		this.setCdType(cdType);
 		this.setArtist(artist);
 	}
+	
+	CD(String title, double cost, String publisher,
+			double runTime, String caseType, String cdType, String artist) {
+		super(title, cost, publisher, runTime, caseType);
+		this.setCdType(cdType);
+		this.setArtist(artist);
+	}
 
 	public String getArtist() {
 		return artist;
@@ -31,5 +38,11 @@ public class CD extends Digital {
 
 	public void setCdType(String cdType) {
 		this.cdType = cdType;
+	}
+	
+	public String toString(){
+		return super.toString() +
+				"\nCD Type \t: " + cdType +
+				"\nArtist \t\t: " + artist;
 	}
 }

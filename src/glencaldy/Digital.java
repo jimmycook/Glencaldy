@@ -14,6 +14,12 @@ public abstract class Digital extends Stock {
 		this.setRunTime(runTime);
 		this.setCaseType(caseType);
 	}
+	
+	Digital(String title, double cost, String publisher, double runTime, String caseType) {
+		super(title, cost, publisher);
+		this.setRunTime(runTime);
+		this.setCaseType(caseType);
+	}
 
 	public double getRunTime() {
 		return runTime;
@@ -31,6 +37,9 @@ public abstract class Digital extends Stock {
 		this.caseType = caseType;
 	}
 	
-	
-	
+	public String toString(){
+		return super.toString() +
+				"\nRun time\t: " + String.valueOf(Math.round(runTime * 100) /100) +
+				"\nCase type \t: " + caseType;
+	}
 }

@@ -8,9 +8,17 @@ public abstract class Stock {
 	private String publisher;
 	private String reservedBy;
 	private String loanedTo;
+	private static int nextID = 3001;
 	
 	Stock(String stockID, String title, double cost, String publisher){
 		this.setStockID(stockID);
+		this.setTitle(title);
+		this.setCost(cost);
+		this.setPublisher(publisher);
+	}
+	
+	Stock(String title, double cost, String publisher){
+		this.setStockID(String.valueOf(getNextID()));
 		this.setTitle(title);
 		this.setCost(cost);
 		this.setPublisher(publisher);
@@ -62,5 +70,21 @@ public abstract class Stock {
 
 	public void setReservedBy(String reservedBy) {
 		this.reservedBy = reservedBy;
+	}
+	
+	public String toString(){
+		return  "StockID\t\t: " + stockID +
+				"\nTitle\t\t: " + title +
+				"\nCost\t\t: £" + String.valueOf(Math.round(cost * 100) / 100) +
+				"\nPublisher\t: " + publisher;
+		
+	}
+
+	public int getNextID() {
+		return nextID++;
+	}
+
+	public void setNextID(int nextID) {
+		Stock.nextID = nextID;
 	}
 }

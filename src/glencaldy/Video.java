@@ -16,7 +16,13 @@ public class Video extends Digital {
 		this.setGenre(genre);
 		this.setVideoFormat(videoFormat);
 	}
-
+	
+	Video(String title, double cost, String publisher,
+			double runTime, String caseType, String genre, String videoFormat) {
+		super(title, cost, publisher, runTime, caseType);
+		this.setGenre(genre);
+		this.setVideoFormat(videoFormat);
+	}
 
 	public String getVideoFormat() {
 		return videoFormat;
@@ -34,4 +40,9 @@ public class Video extends Digital {
 		this.genre = genre;
 	}
 
+	public String toString(){
+		return super.toString() +
+				"\nGenre \t\t: " + genre +
+				"\nVideo Format \t: " + videoFormat;
+	}
 }

@@ -19,6 +19,16 @@ public abstract class Publication extends Stock {
 		this.setNumPages(numPages);
 		
 	}
+	
+	Publication(String title, double cost, String publisher,
+			String subjectArea, String serialNum, int numPages) {
+		super(title, cost, publisher);
+		
+		this.setSubjectArea(subjectArea);
+		this.setSerialNum(serialNum);
+		this.setNumPages(numPages);
+		
+	}
 
 	public int getNumPages() {
 		return numPages;
@@ -44,6 +54,11 @@ public abstract class Publication extends Stock {
 		this.subjectArea = subjectArea;
 	}
 
-
+	public String toString(){
+		return super.toString() +
+				"\nSubject Area\t: " + subjectArea +
+				"\nSerial Number\t: " + serialNum +
+				"\nNumber of Pages\t: " + String.valueOf(numPages);
+	}
 
 }
