@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
+ * 
  * Controller class for the Glencaldy Learning Center CLI
  * 
  * @author jimmycook
@@ -125,15 +126,271 @@ public class LearningCenter {
 	 * @return void
 	 */
 	private void adminMenu() {
+		String input = null;
+		boolean quit = false;
+		do{
+			System.out.println("Administrator Menu");
+			System.out.println("----------------");
+			System.out.println("1. Manage users");
+			System.out.println("2. Manage stock");
+			System.out.println("3. Manage reports");
+			System.out.println("4. Change Password");
+			System.out.println("0. Logout");
+			System.out.println("\nEnter an option");
+			
+			try{
+				input = in.readLine();
+			}
+			catch (IOException e){
+				System.err.println("Error : " + e);
+			}
+			
+			
+			switch (input){ 
+			case "1":
+				manageUsers();
+				break;
+			case "2":
+				manageStock();
+				break;
+			case "3":
+				manageReports();
+				break;
+			case "4":
+				changePassword();
+				break;
+			case "0":
+				this.logout = true;
+				quit = true;
+				break;
+			default:
+				System.out.println("Please enter a valid option");
+				break;
+			}
+		}
+		while(!quit);
+	}
+	
+	/**
+	 * Menu for managing stock
+	 * 
+	 * @return void
+	 */
+	private void manageStock(){
+		String input = null;
+		boolean quit = false;
+		do{
+			System.out.println("Manage Stock");
+			System.out.println("----------------");
+			System.out.println("1. View all items");
+			System.out.println("2. Add an item");
+			System.out.println("3. Remove an item");
+			System.out.println("4. Edit an item");
+			System.out.println("0. Cancel");
+			System.out.println("\nEnter an option");
+			
+			try{
+				input = in.readLine();
+			}
+			catch (IOException e){
+				System.err.println("Error : " + e);
+			}
+			
+			
+			switch (input){ 
+			case "1":
+				viewCatalogue();
+				break;
+			case "2":
+				addStockMenu();
+				break;
+			case "3":
+				removeStockMenu();
+				break;
+			case "4":
+				editStockMenu();
+				break;
+			case "0":
+				this.logout = true;
+				quit = true;
+				break;
+			default:
+				System.out.println("Please enter a valid option");
+				break;
+			}
+		}
+		while(!quit);
+	}
+	
+	private void editStockMenu() {
+		// TODO Auto-generated method stub
 		
 	}
 
+	private void removeStockMenu() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void addStockMenu() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * Menu for managing users
+	 * 
+	 * @return void
+	 */
+	private void manageUsers(){
+		String input = null;
+		boolean quit = false;
+		do{
+			System.out.println("Manage Users");
+			System.out.println("----------------");
+			System.out.println("1. View all users");
+			System.out.println("2. Add a user");
+			System.out.println("3. Remove a user");
+			System.out.println("4. Edit a user's details");
+			System.out.println("0. Logout");
+			System.out.println("\nEnter an option");
+			
+			try{
+				input = in.readLine();
+			}
+			catch (IOException e){
+				System.err.println("Error : " + e);
+			}
+			
+			
+			switch (input){ 
+			case "1":
+				viewUsers();
+				break;
+			case "2":
+				addUserMenu();
+				break;
+			case "3":
+				removeUserMenu();
+				break;
+			case "4":
+				editUserMenu();
+				break;
+			case "0":
+				this.logout = true;
+				quit = true;
+				break;
+			default:
+				System.out.println("Please enter a valid option");
+				break;
+			}
+		}
+		while(!quit);
+	}
+	
+	private void editUserMenu() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void removeUserMenu() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void addUserMenu() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void viewUsers() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * Menu for managing reports
+	 * 
+	 * @return void
+	 */
+	private void manageReports(){
+		String input = null;
+		boolean quit = false;
+		do{
+			System.out.println("Manage Reports");
+			System.out.println("----------------");
+			System.out.println("1. View users");
+			System.out.println("2. View stock");
+			System.out.println("0. Logout");
+			System.out.println("\nEnter an option");
+			
+			try{
+				input = in.readLine();
+			}
+			catch (IOException e){
+				System.err.println("Error : " + e);
+			}
+			
+			
+			switch (input){ 
+			case "1":
+				viewUsers();
+				break;
+			case "2":
+				viewCatalogue();
+				break;
+			case "0":
+				this.logout = true;
+				quit = true;
+				break;
+			default:
+				System.out.println("Please enter a valid option");
+				break;
+			}
+		}
+		while(!quit);
+	}
+	
 	/**
 	 * Menu for CasualUsers
 	 * @return void
 	 */
 	private void casualMenu() {
-		
+		String input = null;
+		boolean quit = false;
+		do{
+			System.out.println("Casual User Menu");
+			System.out.println("----------------");
+			System.out.println("1. View Stock Catalogue");
+			System.out.println("2. Change Password");
+			System.out.println("0. Logout");
+			System.out.println("\nEnter an option");
+			
+			try{
+				input = in.readLine();
+			}
+			catch (IOException e){
+				System.err.println("Error : " + e);
+			}
+			
+			
+			switch (input){ 
+			case "1":
+				viewCatalogue();
+				break;
+			case "2":
+				changePassword();
+				break;
+			case "0":
+				this.logout = true;
+				quit = true;
+				break;
+			default:
+				System.out.println("Please enter a valid option");
+				break;
+			}
+		}
+		while(!quit);
 	}
 	
 	/**
