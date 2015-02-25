@@ -101,6 +101,7 @@ public class LearningCenter {
 	 */
 	private void logout() {
 		this.activeUser = null;
+		this.logout = false;
 	}
 
 
@@ -185,7 +186,6 @@ public class LearningCenter {
 			System.out.println("1. View all items");
 			System.out.println("2. Add an item");
 			System.out.println("3. Remove an item");
-			System.out.println("4. Edit an item");
 			System.out.println("0. Cancel");
 			System.out.println("\nEnter an option");
 			
@@ -207,11 +207,7 @@ public class LearningCenter {
 			case "3":
 				removeStockMenu();
 				break;
-			case "4":
-				editStockMenu();
-				break;
 			case "0":
-				this.logout = true;
 				quit = true;
 				break;
 			default:
@@ -222,21 +218,6 @@ public class LearningCenter {
 		while(!quit);
 	}
 	
-	private void editStockMenu() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void removeStockMenu() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void addStockMenu() {
-		// TODO Auto-generated method stub
-		
-	}
-
 	/**
 	 * Menu for managing users
 	 * 
@@ -252,7 +233,7 @@ public class LearningCenter {
 			System.out.println("2. Add a user");
 			System.out.println("3. Remove a user");
 			System.out.println("4. Edit a user's details");
-			System.out.println("0. Logout");
+			System.out.println("0. Cancel");
 			System.out.println("\nEnter an option");
 			
 			try{
@@ -277,7 +258,6 @@ public class LearningCenter {
 				editUserMenu();
 				break;
 			case "0":
-				this.logout = true;
 				quit = true;
 				break;
 			default:
@@ -288,26 +268,6 @@ public class LearningCenter {
 		while(!quit);
 	}
 	
-	private void editUserMenu() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void removeUserMenu() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void addUserMenu() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void viewUsers() {
-		// TODO Auto-generated method stub
-		
-	}
-
 	/**
 	 * Menu for managing reports
 	 * 
@@ -321,7 +281,7 @@ public class LearningCenter {
 			System.out.println("----------------");
 			System.out.println("1. View users");
 			System.out.println("2. View stock");
-			System.out.println("0. Logout");
+			System.out.println("0. Cancel");
 			System.out.println("\nEnter an option");
 			
 			try{
@@ -340,7 +300,51 @@ public class LearningCenter {
 				viewCatalogue();
 				break;
 			case "0":
-				this.logout = true;
+				quit = true;
+				break;
+			default:
+				System.out.println("Please enter a valid option");
+				break;
+			}
+		}
+		while(!quit);
+	}
+
+	private void removeStockMenu() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void addStockMenu() {
+		String input = null;
+		boolean quit = false;
+		do{
+			System.out.println("Select type of stock to add");
+			System.out.println("----------------");
+			System.out.println("1. Book");
+			System.out.println("2. Journal");
+			System.out.println("3. CD");
+			System.out.println("4. Video");
+			System.out.println("0. Cancel");
+			System.out.println("\nEnter an option");
+			
+			try{
+				input = in.readLine();
+			}
+			catch (IOException e){
+				System.err.println("Error : " + e);
+			}
+			
+			switch (input){ 
+			case "1":
+				break;
+			case "2":
+				break;
+			case "3":
+				break;
+			case "4":
+				break;
+			case "0":
 				quit = true;
 				break;
 			default:
@@ -351,6 +355,45 @@ public class LearningCenter {
 		while(!quit);
 	}
 	
+	private void editUserMenu() {
+		String input = null;
+		
+		System.out.println("Please enter the ID or ID of the user you want to edit.");
+		
+		try{
+			input = in.readLine();
+		}
+		catch(IOException e){
+			System.err.println("Error: " + e);
+		}
+		
+		System.out.println(input);
+		User foundUser = getUserByID(input);
+		
+		if(foundUser == null){
+			foundUser = getUserByUsername(input);
+		}
+	
+		System.out.println(foundUser.toString());
+		
+		
+	}
+
+	private void removeUserMenu() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void addUserMenu() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void viewUsers() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	/**
 	 * Menu for CasualUsers
 	 * @return void
@@ -468,6 +511,28 @@ public class LearningCenter {
 			User curUser = uIt.next();
 			
 			if(userID == curUser.getUserID()){
+				return curUser;
+			}
+		}
+
+		return null;
+	}
+	
+	/**
+	 * 
+	 * Users a username to return a user object from the users ArrayList
+	 * 
+	 * @param String username
+	 * @return User
+	 */
+	private User getUserByUsername(String username){
+		
+		Iterator<User> uIt = allUsers.iterator();
+		
+		while(uIt.hasNext()){
+			User curUser = uIt.next();
+			
+			if(username == curUser.getUsername()){
 				return curUser;
 			}
 		}
@@ -786,5 +851,4 @@ public class LearningCenter {
 		allStock.add(new Journal("Some Journal", 2.5, "Oxford",
 				"Science", "123456789", 240 , "Issue 2", "1/1/2000"));
 	}
-	
 }

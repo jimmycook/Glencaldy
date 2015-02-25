@@ -43,6 +43,6 @@ public class Reservation {
 	
 	public String toString(){
 		return "Reservation ID\t: " + reservationID +
-				"\nStock ID\t:" + stockID; 
+				"\nStock ID\t: " + stockID; 
 	}
 }
