@@ -51,8 +51,10 @@ public class LearningCenter {
 	}
 	
 	/**
+	 * 
 	 * Menu for logging in to the system
 	 * Sets this.activeUser
+	 * 
 	 * @return boolean based on the login success
 	 */
 	private boolean loginMenu() {
