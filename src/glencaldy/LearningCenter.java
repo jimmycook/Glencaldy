@@ -352,6 +352,10 @@ public class LearningCenter {
 		while(!quit);
 	}
 	
+	private User editUser(User u){
+		return u;
+	}
+	
 	private void editUserMenu() {
 		String input = null;
 		
@@ -381,10 +385,25 @@ public class LearningCenter {
 		boolean quit = false;
 		
 		do{
-			System.out.println("Select type of user to add");
+			System.out.println("Enter the username of the user to be added, or 0 to cancel");
 			System.out.println("----------------");
 			
 			input = getInput();
+			
+			if(input.equals("0")){
+				quit = true;
+			}
+			else{
+				try{
+					User u = getUserByUsername(input);
+					System.out.println(u);
+				}
+				catch(Exception e){
+					
+				}
+				
+			}
+				
 		}
 		while(!quit);
 	}
@@ -654,7 +673,7 @@ public class LearningCenter {
 		while(uIt.hasNext()){
 			User curUser = uIt.next();
 			
-			if(userID == curUser.getUserID()){
+			if(curUser.getUserID().equals(userID)){
 				return curUser;
 			}
 		}
@@ -676,7 +695,7 @@ public class LearningCenter {
 		while(uIt.hasNext()){
 			User curUser = uIt.next();
 			
-			if(username == curUser.getUsername()){
+			if(curUser.getUsername().equals(username)){
 				return curUser;
 			}
 		}
@@ -734,6 +753,8 @@ public class LearningCenter {
 	
 	/**
 	 * Overloaded showReservations(User user) to run off of the active user instead
+	 * 
+	 * @return void
 	 */
 	private void showReservations(){
 		if(activeUser.getUserReservations() == null){
@@ -758,6 +779,8 @@ public class LearningCenter {
 	
 	/**
 	 * Allows a full or staff member to create a reservation on an item
+	 * 
+	 * @return void
 	 */
 	private void requestReservation() {
 		String input = null;
@@ -816,6 +839,8 @@ public class LearningCenter {
 	
 	/**
 	 * Changes the password for the login user, requires password confirmation
+	 * 
+	 * @return void
 	 */
 	private void changePassword() {
 		String oldPassword = null;
@@ -889,9 +914,6 @@ public class LearningCenter {
 				System.err.println("Error : " + e);
 		}	
 	}
-
-	
-
 
 	/**
 	 * Login - asks the user for a username and password until they are successfully logged in to the system
