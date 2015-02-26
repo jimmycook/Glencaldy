@@ -106,7 +106,6 @@ public class LearningCenter {
 		this.logout = false;
 	}
 
-
 	/**
 	 * displays the right type of menu for the users that is currently logged in
 	 * @return void
@@ -393,6 +392,14 @@ public class LearningCenter {
 		while(!quit);
 	}
 	
+	/**
+	 * 
+	 * Asks the user for the base attributes for creating an instance of the User
+	 * class. These are: username, password, firstname, and surname. Will not go 
+	 * any further if the username submitted is already in the system.
+	 * 
+	 * @return String[] All of those details in an array 
+	 */
 	private String[] getUserDetails(){
 		String[] details = new String[10]; 
 		
@@ -410,6 +417,11 @@ public class LearningCenter {
 		return details;
 	}
 	
+	/**
+	 * Menu system to add a user
+	 * 
+	 * @return void
+	 */
 	private void addUserMenu() {
 		String input = null;
 		boolean quit = false;
@@ -446,14 +458,19 @@ public class LearningCenter {
 				
 				for(int i = 4; i < adminParams.length; i++){
 					details[i] = askFor(adminParams[i]);
+					if(details[i].equals("")){
+						System.out.println("User creation failed");
+						break;
+
+					}
 				}
+				
 				
 				try{
 					allUsers.add(new Administrator(details[0], details[1], 
 							details[2], details[3], details[4]));
 				}
 				catch(Exception e){
-					System.out.println("User creation failed");
 					break;
 				}
 				
@@ -462,16 +479,28 @@ public class LearningCenter {
 				break;
 			case "2":
 				System.out.println("Create casual user");
-				String casual[] = {"username","password","first name", "surname", "address", "town", "postcode", "dateOfBirth"};
-
-				for(int i = 0; i < casual.length; i++){
-					casual[i] = askFor(casual[i]);
+				String casual[] = {"username","password","first name", "surname", "address", "town", "postcode", "date of birth (format dd/MM/yy"};
+				
+				details = getUserDetails();
+				
+				if(details == null){
+					break;
 				}
 				
+				for(int i = 4; i < casual.length; i++){
+					details[i] = askFor(casual[i]);
+					if(details[i].equals("")){
+						System.out.println("User creation failed");
+						break;
+
+					}
+				}
+				
+				
 				try{
-					allUsers.add(new CasualUser(casual[0], casual[1], 
-							casual[2], casual[3], casual[4], casual[5], 
-							casual[6], casual[7]));
+					allUsers.add(new CasualUser(details[0], details[1], 
+							details[2], details[3], details[4], details[5], 
+							details[6], details[7]));
 				}
 				catch(Exception e){
 					System.out.println("User creation failed");
@@ -485,14 +514,25 @@ public class LearningCenter {
 				System.out.println("Create full member");
 				String full[] = {"username","password","first name", "surname", "address", "town", "postcode", "date of birth (format dd/MM/yyyy)"};
 
-				for(int i = 0; i < full.length; i++){
-					full[i] = askFor(full[i]);
+				details = getUserDetails();
+				
+				if(details == null){
+					break;
+				}
+				
+				for(int i = 4; i < full.length; i++){
+					details[i] = askFor(full[i]);
+					if(details[i].equals("")){
+						System.out.println("User creation failed");
+						break;
+
+					}
 				}
 				
 				try{
-					allUsers.add(new FullMember(full[0], full[1], 
-							full[2], full[3], full[4], full[5], 
-							full[6], full[7]));
+					allUsers.add(new FullMember(details[0], details[1], 
+							details[2], details[3], details[4], details[5], 
+							details[6], details[7]));
 				}
 				catch(Exception e){
 					System.out.println("User creation failed");
@@ -506,14 +546,25 @@ public class LearningCenter {
 				System.out.println("Create staff member");
 				String staff[] = {"username","password","first name", "surname", "staff ID", "staff email", "staff telephone extension"};
 
-				for(int i = 0; i < staff.length; i++){
-					staff[i] = askFor(staff[i]);
+				details = getUserDetails();
+				
+				if(details == null){
+					break;
+				}
+				
+				for(int i = 4; i < staff.length; i++){
+					details[i] = askFor(staff[i]);
+					if(details[i].equals("")){
+						System.out.println("User creation failed");
+						break;
+
+					}
 				}
 				
 				try{
-					allUsers.add(new StaffMember(staff[0], staff[1], 
-							staff[2], staff[3], staff[4], staff[5], 
-							staff[6]));
+					allUsers.add(new StaffMember(details[0], details[1], 
+							details[2], details[3], details[4], details[5], 
+							details[6]));
 				}
 				catch(Exception e){
 					System.out.println("User creation failed");
