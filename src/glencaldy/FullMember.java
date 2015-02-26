@@ -35,6 +35,10 @@ public class FullMember extends User{
 		this.setDateOfBirth(dateOfBirth);
 	}
 	
+	FullMember(CasualUser u){
+		this(u.getUsername(), u.getPassword(), u.getFirstname(), u.getSurname(), u.getAddress(), u.getTown(), u.getPostcode(), u.getDateOfBirth());
+	}
+	
 	public Loan createLoan(String stockID){
 		Loan l = new Loan(stockID); 
 		

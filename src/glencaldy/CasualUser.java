@@ -11,8 +11,9 @@ public class CasualUser extends User{
 		super(userID, password, firstname, surname);
 	}
 	
-	CasualUser(String userID, String password, String firstname, String surname, String address, String town, String postcode, String dateOfBirth) {
-		super(userID, password, firstname, surname);
+	CasualUser(String username, String password, String firstname, String surname,
+			String address, String town, String postcode, String dateOfBirth) {
+		super(username, password, firstname, surname);
 		this.address = address;
 		this.town = town;
 		this.postcode = postcode;

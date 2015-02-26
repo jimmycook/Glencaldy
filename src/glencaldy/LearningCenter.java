@@ -74,7 +74,6 @@ public class LearningCenter {
 					System.err.println("Error : " + e);
 			}
 			
-			
 			switch (input){ 
 			case "1":
 				activeUser = null;
@@ -112,18 +111,18 @@ public class LearningCenter {
 	 * @return void
 	 */
 	private void getMenu(){
-		String userType = activeUser.getClass().getName();
 		
-		if(userType.equals("glencaldy.CasualUser")){
+		if(activeUser instanceof CasualUser){
 			casualMenu();
 		}
-		else if(userType.equals("glencaldy.Administrator")){
+		else if(activeUser instanceof Administrator){
 			adminMenu();
 		}
 		else{
 			fullMenu();
 		}
 	}
+	
 	/**
 	 * Admin menu for Administrator users only
 	 * @return void
@@ -234,7 +233,6 @@ public class LearningCenter {
 			System.out.println("1. View all users");
 			System.out.println("2. Add a user");
 			System.out.println("3. Remove a user");
-			System.out.println("4. Edit a user's details");
 			System.out.println("0. Cancel");
 			System.out.println("\nEnter an option");
 			
@@ -245,7 +243,6 @@ public class LearningCenter {
 				System.err.println("Error : " + e);
 			}
 			
-			
 			switch (input){ 
 			case "1":
 				viewUsers();
@@ -255,9 +252,6 @@ public class LearningCenter {
 				break;
 			case "3":
 				removeUserMenu();
-				break;
-			case "4":
-				editUserMenu();
 				break;
 			case "0":
 				quit = true;
@@ -283,6 +277,7 @@ public class LearningCenter {
 			System.out.println("----------------");
 			System.out.println("1. View users");
 			System.out.println("2. View stock");
+			System.out.println("3. View loans");
 			System.out.println("0. Cancel");
 			System.out.println("\nEnter an option");
 			
@@ -382,17 +377,164 @@ public class LearningCenter {
 	}
 
 	private void removeUserMenu() {
-		// TODO Auto-generated method stub
+		String input = null;
+		boolean quit = false;
 		
+		do{
+			System.out.println("Select type of user to add");
+			System.out.println("----------------");
+			
+			input = getInput();
+		}
+		while(!quit);
 	}
 
 	private void addUserMenu() {
-		// TODO Auto-generated method stub
-		
-	}
+		String input = null;
+		boolean quit = false;
+		do{
+			System.out.println("Select type of user to add");
+			System.out.println("----------------");
+			System.out.println("1. Administrator");
+			System.out.println("2. Casual User");
+			System.out.println("3. Full Member");
+			System.out.println("4. Staff Member");
+			System.out.println("0. Cancel");
+			System.out.println("\nEnter an option");
+			
+			try{
+				input = in.readLine();
+			}
+			catch (IOException e){
+				System.err.println("Error : " + e);
+			}
+			
+			switch (input){ 
+			case "1":
+				System.out.println("Create administrator user");
+				String admin[] = {"username","password","first name", "surname", "staff ID"};
 
+				for(int i = 0; i < admin.length; i++){
+					admin[i] = askFor(admin[i]);
+				}
+				
+				try{
+					allUsers.add(new Administrator(admin[0], admin[1], 
+							admin[2], admin[3], admin[4]));
+				}
+				catch(Exception e){
+					System.out.println("User creation failed");
+					break;
+				}
+				
+				System.out.println("User created successfully");
+				
+				break;
+			case "2":
+				System.out.println("Create casual user");
+				String casual[] = {"username","password","first name", "surname", "address", "town", "postcode", "dateOfBirth"};
+
+				for(int i = 0; i < casual.length; i++){
+					casual[i] = askFor(casual[i]);
+				}
+				
+				try{
+					allUsers.add(new CasualUser(casual[0], casual[1], 
+							casual[2], casual[3], casual[4], casual[5], 
+							casual[6], casual[7]));
+				}
+				catch(Exception e){
+					System.out.println("User creation failed");
+					break;
+				}
+				
+				System.out.println("User created successfully");
+				
+				break;
+			case "3":
+				System.out.println("Create full member");
+				String full[] = {"username","password","first name", "surname", "address", "town", "postcode", "date of birth (format dd/MM/yyyy)"};
+
+				for(int i = 0; i < full.length; i++){
+					full[i] = askFor(full[i]);
+				}
+				
+				try{
+					allUsers.add(new FullMember(full[0], full[1], 
+							full[2], full[3], full[4], full[5], 
+							full[6], full[7]));
+				}
+				catch(Exception e){
+					System.out.println("User creation failed");
+					break;
+				}
+				
+				System.out.println("User created successfully");
+				
+				break;
+			case "4":
+				System.out.println("Create staff member");
+				String staff[] = {"username","password","first name", "surname", "staff ID", "staff email", "staff telephone extension"};
+
+				for(int i = 0; i < staff.length; i++){
+					staff[i] = askFor(staff[i]);
+				}
+				
+				try{
+					allUsers.add(new StaffMember(staff[0], staff[1], 
+							staff[2], staff[3], staff[4], staff[5], 
+							staff[6]));
+				}
+				catch(Exception e){
+					System.out.println("User creation failed");
+					break;
+				}
+				
+				System.out.println("User created successfully");
+				
+				break;
+			case "0":
+				quit = true;
+				break;
+			default:
+				System.out.println("Please enter a valid option");
+				break;
+			}
+		}
+		while(!quit);
+	}
+	
+	/**
+	 * Asks the users for a thing
+	 * @param thing to ask the user for
+	 * @return user input String
+	 */
+	private String askFor(String thing){
+		System.out.println("Please enter " + thing);
+		return getInput();
+	}
+	
+	/** 
+	 * Gets user input
+	 * @return
+	 */
+	private String getInput(){
+		String temp = null;
+		try{
+			temp = in.readLine();
+		}
+		catch (Exception e){
+			System.err.println("Error : " + e);
+		}
+		return temp;
+	};
+	
+	/**
+	 * Displays all the users
+	 * 
+	 * @return void
+	 */
 	private void viewUsers() {
-		// TODO Auto-generated method stub
 		
 	}
 
