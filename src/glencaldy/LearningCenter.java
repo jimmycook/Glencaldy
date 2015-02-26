@@ -44,10 +44,11 @@ public class LearningCenter {
 			
 			if(logout){
 				logout();
+				quit = true;
 			}
 		}
 		while(!quit);
-		
+		System.out.println("System shutting down");
 	}
 	
 	/**
@@ -353,6 +354,7 @@ public class LearningCenter {
 	}
 	
 	private User editUser(User u){
+		
 		return u;
 	}
 	
@@ -396,10 +398,11 @@ public class LearningCenter {
 			else{
 				try{
 					User u = getUserByUsername(input);
-					System.out.println(u);
+					
+					allUsers.remove(u);
 				}
 				catch(Exception e){
-					
+					System.out.println("User now found");
 				}
 				
 			}
@@ -407,10 +410,29 @@ public class LearningCenter {
 		}
 		while(!quit);
 	}
-
+	
+	private String[] getUserDetails(){
+		String[] details = new String[10]; 
+		
+		details[0] = askFor("username");
+		
+		if(getUserByUsername(details[0]) != null){
+			System.out.println("User with the username " + details[0] +" already exists");
+			return null;
+		}
+		
+		details[1] = askFor("password");
+		details[2] = askFor("first name");
+		details[3] = askFor("surname");
+		
+		return details;
+	}
+	
 	private void addUserMenu() {
 		String input = null;
 		boolean quit = false;
+		String[] details = null;
+
 		do{
 			System.out.println("Select type of user to add");
 			System.out.println("----------------");
@@ -420,6 +442,7 @@ public class LearningCenter {
 			System.out.println("4. Staff Member");
 			System.out.println("0. Cancel");
 			System.out.println("\nEnter an option");
+			details = null;
 			
 			try{
 				input = in.readLine();
@@ -431,15 +454,21 @@ public class LearningCenter {
 			switch (input){ 
 			case "1":
 				System.out.println("Create administrator user");
-				String admin[] = {"username","password","first name", "surname", "staff ID"};
-
-				for(int i = 0; i < admin.length; i++){
-					admin[i] = askFor(admin[i]);
+				String[] adminParams = {"username","password","first name", "surname", "staff ID"};
+				
+				details = getUserDetails();
+				
+				if(details == null){
+					break;
+				}
+				
+				for(int i = 4; i < adminParams.length; i++){
+					details[i] = askFor(adminParams[i]);
 				}
 				
 				try{
-					allUsers.add(new Administrator(admin[0], admin[1], 
-							admin[2], admin[3], admin[4]));
+					allUsers.add(new Administrator(details[0], details[1], 
+							details[2], details[3], details[4]));
 				}
 				catch(Exception e){
 					System.out.println("User creation failed");
