@@ -44,10 +44,10 @@ public class LearningCenter {
 			
 			if(logout){
 				logout();
-				quit = true;
 			}
 		}
 		while(!quit);
+		
 		System.out.println("System shutting down");
 	}
 	
@@ -358,36 +358,13 @@ public class LearningCenter {
 		return u;
 	}
 	
-	private void editUserMenu() {
-		String input = null;
-		
-		System.out.println("Please enter the ID or ID of the user you want to edit.");
-		
-		try{
-			input = in.readLine();
-		}
-		catch(IOException e){
-			System.err.println("Error: " + e);
-		}
-		
-		System.out.println(input);
-		User foundUser = getUserByID(input);
-		
-		if(foundUser == null){
-			foundUser = getUserByUsername(input);
-		}
-	
-		System.out.println(foundUser.toString());
-		
-		
-	}
-
 	private void removeUserMenu() {
 		String input = null;
 		boolean quit = false;
+		User u = null;
 		
 		do{
-			System.out.println("Enter the username of the user to be added, or 0 to cancel");
+			System.out.println("Enter the username of the user to be removed, or 0 to cancel");
 			System.out.println("----------------");
 			
 			input = getInput();
@@ -397,12 +374,17 @@ public class LearningCenter {
 			}
 			else{
 				try{
-					User u = getUserByUsername(input);
-					
-					allUsers.remove(u);
+					u = getUserByUsername(input);
 				}
 				catch(Exception e){
-					System.out.println("User now found");
+					System.out.println("User not found");
+				}
+				
+				if(u != null){
+					System.out.println("User found");
+					allUsers.remove(u);
+					System.out.println("User removed");
+					quit = true;
 				}
 				
 			}
@@ -915,14 +897,24 @@ public class LearningCenter {
 						finished = true;
 						System.out.println("Password changed successfully");
 					}
-					else
+					else{
 						attempts--;
+						
+						if(attempts < 1){
+							System.out.println("Failed try again");
+						}
+					}
 				}
 			}
 		}
 		
 	}
 
+	/**
+	 * Shows the catalogue of all stock in the system
+	 * 
+	 * @return void
+	 */
 	private void viewCatalogue() {
 		Iterator<Stock> stockIt = allStock.iterator();
 		
@@ -996,7 +988,7 @@ public class LearningCenter {
 		}
 		
 		if(foundUser == null){
-			System.out.println("Login failed - user now found");
+			System.out.println("Login failed - user not found");
 		}
 		
 		return null;
