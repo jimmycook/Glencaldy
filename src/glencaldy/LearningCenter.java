@@ -202,7 +202,7 @@ public class LearningCenter {
 				addLoan();
 				break;
 			case "3":
-				
+				removeLoan();
 				break;
 			case "0":
 				
@@ -215,6 +215,59 @@ public class LearningCenter {
 		while(!quit);
 	}
 	
+	private void removeLoan() {
+		String input = askFor("the username of the user that the item "
+				+ "was loaned to");
+		
+		User u = getUserByUsername(input);
+		
+		if(u == null){
+			System.out.println("User not found");
+			return;
+		}
+		
+		Borrower b = isBorrower(u);
+		
+		if(b == null){
+			System.out.println("This user can not borrow items");
+			return;
+		}
+		
+		System.out.println("Loans for " + b.getUsername());
+		System.out.println("----------------");
+		Iterator<Loan> it = b.getUserLoans().iterator();
+		while(it.hasNext()){
+			Loan l = it.next();
+			
+			System.out.println(l.toString());
+			System.out.println("----------------");
+			
+		}
+		input = askFor("the ID of the loan to be returned");
+		
+		it = b.getUserLoans().iterator();
+		while(it.hasNext()){
+			Loan l = it.next();
+			
+			if(l.getLoanID().equals(input)){
+				System.out.println("Press enter to continue, or enter 0 to cancel the loan");
+				String i = askFor("anything to continue, or enter 0 to cancel the loan");
+				
+				switch(i){
+				case "0":
+					System.out.println("Cancelled");
+					break;
+				default:
+					b.getUserLoans().remove(l);
+					Stock item = getStockByID(l.getStockID());
+					item.setLoanedTo(null);
+					System.out.println("Item returned successfully");
+					break;
+				}
+			}
+		}
+	}
+
 	/**
 	 * Creates a loan
 	 * 
@@ -277,7 +330,12 @@ public class LearningCenter {
 			System.out.println("Item not found");
 		}
 	}
-
+	
+	/**
+	 * Displays all the loans in the system
+	 * 
+	 * @return void
+	 */
 	private void viewLoans() {
 		Iterator<User> uIt = allUsers.iterator();
 		Borrower b = null;
@@ -310,8 +368,8 @@ public class LearningCenter {
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * checks if the user is a borrower, if so returns the user as a borrower
+	 * @return Borrower object
 	 */
 	public Borrower isBorrower(User u){
 		if(u instanceof Borrower){
@@ -546,10 +604,6 @@ public class LearningCenter {
 		while(!quit);
 	}
 	
-	private User editUser(User u){
-		
-		return u;
-	}
 	
 	private void removeUserMenu() {
 		String input = null;
