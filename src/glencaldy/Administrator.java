@@ -22,5 +22,10 @@ public class Administrator extends User {
 	public void setStaffID(String staffID) {
 		this.staffID = staffID;
 	}
+	
+	public String toString(){
+		return super.toString() + 
+				"\nStaff ID\t: " + staffID;
+	}
 
 }

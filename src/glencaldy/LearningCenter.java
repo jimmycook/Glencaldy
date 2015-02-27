@@ -25,6 +25,11 @@ public class LearningCenter {
 	private BufferedReader in = new BufferedReader(converter);
 	
 	LearningCenter(){
+		
+		Borrower b  = new StaffMember("staffmember", "password", "John", "Doe", StaffMember.getNextID(),
+						"staffmember@glencaldy.com", "100");
+		
+		b.createLoan("3003").toString();
 		boolean quit = false;
 		System.out.println("Controller starting\n\n");
 		
@@ -136,7 +141,8 @@ public class LearningCenter {
 			System.out.println("1. Manage users");
 			System.out.println("2. Manage stock");
 			System.out.println("3. Manage reports");
-			System.out.println("4. Change Password");
+			System.out.println("4. Manage loans");
+			System.out.println("5. Change password");
 			System.out.println("0. Logout");
 			System.out.println("\nEnter an option");
 			
@@ -146,7 +152,6 @@ public class LearningCenter {
 			catch (IOException e){
 				System.err.println("Error : " + e);
 			}
-			
 			
 			switch (input){ 
 			case "1":
@@ -159,6 +164,9 @@ public class LearningCenter {
 				manageReports();
 				break;
 			case "4":
+				manageLoans();
+				break;
+			case "5":
 				changePassword();
 				break;
 			case "0":
@@ -171,6 +179,146 @@ public class LearningCenter {
 			}
 		}
 		while(!quit);
+	}
+	
+	private void manageLoans() {
+		String input = null;
+		boolean quit = false;
+		do{
+			System.out.println("Manage Loans");
+			System.out.println("----------------");
+			System.out.println("1. View loans");
+			System.out.println("2. Loan item");
+			System.out.println("3. Return item");
+			System.out.println("0. Quit");
+			
+			input = getInput();
+			
+			switch(input){
+			case "1":
+				viewLoans();
+				break;
+			case "2":
+				addLoan();
+				break;
+			case "3":
+				
+				break;
+			case "0":
+				
+				break;
+			default:
+				System.out.println("Invalid input");
+				break;
+			}
+		}
+		while(!quit);
+	}
+	
+	/**
+	 * Creates a loan
+	 * 
+	 * @return void
+	 */
+	private void addLoan() {		
+		String input = askFor("the username of the user that the item "
+				+ "is being loaned to");
+		User u = getUserByUsername(input);
+		
+		if(u == null){
+			System.out.println("User not found");
+			return;
+		}
+		
+		Borrower b = isBorrower(u);
+		
+		if(b == null){
+			System.out.println("This user can not borrow items");
+			return;
+		}
+		if(b.getBorrowingQuota() <= b.getUserLoans().size()){
+			System.out.println("Users borrowing quota reached");
+			return;
+		}
+		
+		input = askFor("the stock ID of the item to be loaned, or enter"
+				+ " nothing to cancel");
+		
+		Stock item = getStockByID(input);
+		
+		if(item != null){
+			System.out.println("Item found");
+			
+			if(item.getLoanedTo() != null){
+				System.out.println("This item is already out on loan");
+			}
+			else{
+				
+				String reservedBy = b.getReservedBy();
+				
+				if(reservedBy != null){
+					System.out.println("Item is reserved " + getUserByID(reservedBy).getUsername() + 
+							"(ID: " + reservedBy + ")");
+				}
+				System.out.println("Issue loan?");
+				String issue = askFor("y for yes, anything else for no");
+				
+				if(issue.equals("y")){
+					b.createLoan(input);
+					item.setReservedBy(null);
+					item.setLoanedTo(b.getUserID());
+					System.out.println("Loan created");
+				}
+				else 
+					System.out.println("Loan cancelled");
+			}
+		}
+		else{
+			System.out.println("Item not found");
+		}
+	}
+
+	private void viewLoans() {
+		Iterator<User> uIt = allUsers.iterator();
+		Borrower b = null;
+		boolean found = false;
+		System.out.println("All loans");
+		System.out.println("----------------");
+
+		while(uIt.hasNext()){
+			b = null;
+			User u = uIt.next();
+			b = isBorrower(u);
+			if(b != null){
+				ArrayList<Loan> lList = b.getUserLoans();
+				Iterator<Loan> lIt = lList.iterator(); 
+				while(lIt.hasNext()){
+					Loan l = lIt.next();
+					System.out.println(l.toString());
+					System.out.println("User\t\t: " + b.getUsername());
+					System.out.println("----------------");
+					found = true;
+				}
+				
+			}
+		}
+		if(!found){
+			System.out.println("No loans in system");
+		}
+		System.out.println("Press enter to continue");
+		getInput();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Borrower isBorrower(User u){
+		if(u instanceof Borrower){
+			return (Borrower) u;
+		}
+		
+		return null;
 	}
 	
 	/**
@@ -308,8 +456,54 @@ public class LearningCenter {
 	}
 
 	private void removeStockMenu() {
-		// TODO Auto-generated method stub
+		String input = null;
+		boolean quit = false;
+		Stock s = null;
 		
+		do{
+			System.out.println("Enter the username of the user to be removed, or 0 to cancel");
+			System.out.println("----------------");
+			
+			input = getInput();
+			
+			if(input.equals("0")){
+				quit = true;
+			}
+			else{
+				try{
+					s = getStockByID(input);
+				}
+				catch(Exception e){
+					System.err.println("Error " + e);
+				}
+				
+				if(s != null){
+					System.out.println("Item found");
+					allStock.remove(s);
+					System.out.println("Item removed");
+					quit = true;
+				}	
+				else{
+					System.out.println("Item not found");
+				}
+			}
+		}
+		while(!quit);
+	}
+
+	private Stock getStockByID(String input) {
+
+		Iterator<Stock> it = allStock.iterator();
+		
+		while(it.hasNext()){
+			Stock cur = it.next();
+			
+			if(cur.getStockID().equals(input)){
+				return cur;
+			}
+		}
+
+		return null;
 	}
 
 	private void addStockMenu() {
@@ -385,7 +579,10 @@ public class LearningCenter {
 					System.out.println("User removed");
 					quit = true;
 				}
-				
+
+				else{
+					System.out.println("User not found");
+				}
 			}
 				
 		}
@@ -616,7 +813,24 @@ public class LearningCenter {
 	 * @return void
 	 */
 	private void viewUsers() {
+		Iterator<User> uIt = allUsers.iterator();
 		
+		System.out.println("--------------------------");
+		System.out.println("View All Users");
+		System.out.println("--------------------------");
+		
+		while(uIt.hasNext()){
+			System.out.println(uIt.next().toString());
+			System.out.println("--------------------------");
+		}
+		
+		System.out.println("Press enter to continue");
+		try{
+			in.readLine();
+		}
+		catch (IOException e){
+				System.err.println("Error : " + e);
+		}	
 	}
 
 	/**
@@ -763,31 +977,6 @@ public class LearningCenter {
 		}
 
 		return null;
-	}
-	
-	/**
-	 * Provides the subclass name of a user object
-	 * @param user 
-	 * @return user type as string
-	 */
-	private String getUserType(User user){
-		String userType = user.getClass().getName();
-		
-		if(userType.equals("glencaldy.FullMember")){
-			return  "FullMember";
-		}
-		else if(userType.equals("glencaldy.StaffMember")){
-			return "StaffMember";
-		}
-		else if(userType.equals("glencaldy.Administrator")){
-			return "Administrator";
-		}
-		else if(userType.equals("glencaldy.CasualUser")){
-			return "CasualUser";
-		}
-		
-		return "User";
-		
 	}
 	
 	/**

@@ -51,5 +51,12 @@ public class CasualUser extends User{
 	public void setAddress(String address) {
 		this.address = address;
 	}
-
+	
+	public String toString(){
+		return super.toString() +
+				"\nAddress\t: " + address +
+				"\nTown\t: " + town +
+				"\nPostcode\t: " + postcode +
+				"\nDate of birth\t: " + dateOfBirth;
+	}
 }

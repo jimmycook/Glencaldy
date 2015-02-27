@@ -6,8 +6,8 @@ public abstract class Stock {
 	private String title;
 	private double cost;
 	private String publisher;
-	private String reservedBy;
-	private String loanedTo;
+	private String reservedBy = null;
+	private String loanedTo = null;
 	private static int nextID = 3001;
 	
 	Stock(String stockID, String title, double cost, String publisher){

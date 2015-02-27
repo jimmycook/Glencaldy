@@ -98,4 +98,11 @@ public abstract class User {
 	public ArrayList<Reservation> getUserReservations() {
 		return null;
 	}
+	
+	public String toString(){
+		
+		return "User ID\t: "+ this.userID +
+				"\nUsername\t: "+ this.username +
+				"\nName\t: " + this.firstname + " " + this.surname;
+	}
 }

@@ -40,4 +40,9 @@ public class Loan {
 	public void setTimestamp(Timestamp timestamp) {
 		this.timestamp = timestamp;
 	}
+	
+	public String toString(){
+		return "Loan ID\t: " + loanID +
+				"\nStock ID\t: " + stockID; 
+	}
 }
