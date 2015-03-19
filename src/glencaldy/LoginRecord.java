@@ -1,18 +1,15 @@
 package glencaldy;
 
-import java.sql.*;
+import java.util.Date;
 
 public class LoginRecord {
 	
 	private String computerID = "1"; //Hard coded for prototype
-	private Timestamp timestamp;
+	private Date date = new Date();
 	private String userID;
 	
 	LoginRecord(String uID){
-		java.util.Date date= new java.util.Date();
-		this.timestamp = new Timestamp(date.getTime());
 		this.userID = uID;
-		
 	}
 	
 	public String getComputerID() {
@@ -29,12 +26,10 @@ public class LoginRecord {
 	public void setUserID(String userID) {
 		this.userID = userID;
 	}
-
-	public Timestamp getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(Timestamp timestamp) {
-		this.timestamp = timestamp;
+	
+	public String toString(){
+		return "User ID: \t" + userID +
+				"\nComp ID: \t" + String.valueOf(computerID) + 
+				"\nDate: \t" + date.toString();
 	}
 }

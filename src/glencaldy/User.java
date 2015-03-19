@@ -1,5 +1,6 @@
 package glencaldy;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 
@@ -8,8 +9,12 @@ import java.util.ArrayList;
  * 
  * @author jimmycook
  */
-public abstract class User {
+public abstract class User implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static int nextUID = 1001;
 	private String username;
 	private String userID;
@@ -104,5 +109,9 @@ public abstract class User {
 		return "User ID\t: "+ this.userID +
 				"\nUsername\t: "+ this.username +
 				"\nName\t: " + this.firstname + " " + this.surname;
+	}
+	
+	public ArrayList<LoginRecord> getLoginRecords(){
+		return loginRecords;
 	}
 }

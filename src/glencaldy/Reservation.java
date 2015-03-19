@@ -1,20 +1,17 @@
 package glencaldy;
 
-import java.sql.Timestamp;
-import java.util.Date;
 
 public class Reservation {
 	private static int nextID = 9001;
 	private String reservationID;
 	private String stockID;
-	private Timestamp timestamp;
+	private java.util.Date date;
 	
 	Reservation(String stockID){
 		this.reservationID = String.valueOf(nextID++);
 		this.stockID = stockID;
 		
-		Date date= new java.util.Date();
-		this.timestamp = new Timestamp(date.getTime());
+		this.setDate(new java.util.Date());
 	}
 
 	public String getReservationID() {
@@ -33,16 +30,18 @@ public class Reservation {
 		this.stockID = stockID;
 	}
 
-	public Timestamp getTimestamp() {
-		return timestamp;
-	}
-
-	public void setTimestamp(Timestamp timestamp) {
-		this.timestamp = timestamp;
-	}
 	
 	public String toString(){
 		return "Reservation ID\t: " + reservationID +
-				"\nStock ID\t: " + stockID;
+				"\nStock ID\t: " + stockID +
+				"\nCreated on: " + date.toString();		
+	}
+
+	public java.util.Date getDate() {
+		return date;
+	}
+
+	public void setDate(java.util.Date date) {
+		this.date = date;
 	}
 }

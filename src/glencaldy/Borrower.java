@@ -10,6 +10,7 @@ public class Borrower extends User{
 	}
 	protected int borrowingQuota = 	4;
 	protected boolean isSuspended = false;
+	protected double fine;
 	protected ArrayList<Loan> userLoans = new ArrayList<Loan>();
 	protected ArrayList<Reservation> userReservations = new ArrayList<Reservation>();
 	
@@ -63,6 +64,14 @@ public class Borrower extends User{
 	public String getReservedBy() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public double getFine(){
+		return fine;
+	}
+	
+	public void setFine(double f){
+		this.fine = f;
 	}
 	
 }

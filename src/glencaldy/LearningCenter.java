@@ -1,14 +1,20 @@
 package glencaldy;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+
+
 /**
  * 
- * Controller class for the Glencaldy Learning Center CLI
+ * Controller class for the Glencaldy Learning Center application
  * 
  * @author jimmycook
  *
@@ -25,37 +31,75 @@ public class LearningCenter {
 	private BufferedReader in = new BufferedReader(converter);
 	
 	LearningCenter(){
-		
-		Borrower b  = new StaffMember("staffmember", "password", "John", "Doe", StaffMember.getNextID(),
-						"staffmember@glencaldy.com", "100");
-		
-		b.createLoan("3003").toString();
 		boolean quit = false;
 		System.out.println("Controller starting\n\n");
 		
 		populateUsers();
 		populateStock();
 		
-		do{
+		while(!quit){
 			welcomeMessage();
 			if(activeUser == null){
 				quit = loginMenu();
 			}
-			
-			while(!logout)
-			{
-				getMenu();
+			else{
+				while(!logout)
+				{
+					getMenu();
+				}
+				
+				if(logout){
+					logout();
+				}
 			}
-			
-			if(logout){
-				logout();
-			}
+
 		}
-		while(!quit);
 		
 		System.out.println("System shutting down");
 	}
 	
+	/**
+	 * Logs the current user out and serialises the allUsers ArrayList
+	 * 
+	 * @return void
+	 */
+	public void logout() {
+		this.activeUser = null;
+		this.logout = false;
+		
+		try{
+			FileOutputStream fos= new FileOutputStream("allUsers");
+	        ObjectOutputStream oos= new ObjectOutputStream(fos);
+			oos.writeObject(this.allUsers);
+			oos.close();
+	        fos.close();
+		}
+		catch(IOException ioe)
+		{
+			ioe.printStackTrace();
+	    }
+	}
+
+	/**
+	 * displays the right type of menu for the users that is currently logged in
+	 * @return void
+	 */
+	public void getMenu(){
+		
+		if(activeUser instanceof CasualUser){
+			casualMenu();
+		}
+		else if(activeUser instanceof Administrator){
+			adminMenu();
+		}
+		else if(activeUser instanceof StaffMember){
+			fullMenu();
+		}
+		else if(activeUser instanceof FullMember){
+			fullMenu();
+		}
+	}
+
 	/**
 	 * 
 	 * Menu for logging in to the system
@@ -63,7 +107,7 @@ public class LearningCenter {
 	 * 
 	 * @return boolean based on the login success
 	 */
-	private boolean loginMenu() {
+	public boolean loginMenu() {
 		String input = null;
 		boolean quit = false;
 		while(!quit){
@@ -102,37 +146,10 @@ public class LearningCenter {
 	}
 
 	/**
-	 * Logs the current user out and serialises the allUsers ArrayList
-	 * 
-	 * @return void
-	 */
-	private void logout() {
-		this.activeUser = null;
-		this.logout = false;
-	}
-
-	/**
-	 * displays the right type of menu for the users that is currently logged in
-	 * @return void
-	 */
-	private void getMenu(){
-		
-		if(activeUser instanceof CasualUser){
-			casualMenu();
-		}
-		else if(activeUser instanceof Administrator){
-			adminMenu();
-		}
-		else{
-			fullMenu();
-		}
-	}
-	
-	/**
 	 * Admin menu for Administrator users only
 	 * @return void
 	 */
-	private void adminMenu() {
+	public void adminMenu() {
 		String input = null;
 		boolean quit = false;
 		do{
@@ -143,6 +160,7 @@ public class LearningCenter {
 			System.out.println("3. Manage reports");
 			System.out.println("4. Manage loans");
 			System.out.println("5. Change password");
+			System.out.println("6. Issue fine");
 			System.out.println("0. Logout");
 			System.out.println("\nEnter an option");
 			
@@ -169,6 +187,8 @@ public class LearningCenter {
 			case "5":
 				changePassword();
 				break;
+			case "6": 
+				issueFine();
 			case "0":
 				this.logout = true;
 				quit = true;
@@ -181,7 +201,287 @@ public class LearningCenter {
 		while(!quit);
 	}
 	
-	private void manageLoans() {
+	public void issueFine(){
+		String i = askFor("the username of the user that the item "
+				+ "is being loaned to");
+		User u = getUserByUsername(i);
+		
+		if(u == null){
+			System.out.println("User not found");
+		}
+		else{
+			Borrower b = isBorrower(u);
+			
+			if(b == null){
+				System.out.println("This user can not borrow items");
+				return;
+			}
+			else{
+				i = askFor("amount in pounds and pence (as a number with 2 decimal places) to fine the user");
+				try{
+					if(Double.valueOf(i) > 0){
+						b.setFine(b.getFine() + Double.valueOf(i));
+						b.setIsSuspended(true);
+					}
+					
+				}
+				catch(Exception e){
+					System.out.println("Fine failed");
+				}
+				System.out.println("Fine issued");
+			}
+		}
+		
+		
+	}
+	
+	/**
+	 * Menu for CasualUsers
+	 * @return void
+	 */
+	public void casualMenu() {
+		String input = null;
+		boolean quit = false;
+		do{
+			System.out.println("Casual User Menu");
+			System.out.println("----------------");
+			System.out.println("1. View Stock Catalogue");
+			System.out.println("2. Change Password");
+			System.out.println("3. Edit account details");
+			System.out.println("0. Logout");
+			System.out.println("\nEnter an option");
+			
+			try{
+				input = in.readLine();
+			}
+			catch (IOException e){
+				System.err.println("Error : " + e);
+			}
+			
+			
+			switch (input){ 
+			case "1":
+				viewCatalogue();
+				break;
+			case "2":
+				changePassword();
+				break;
+			case "3": 
+				editUser();
+			case "0":
+				this.logout = true;
+				quit = true;
+				break;
+			default:
+				System.out.println("Please enter a valid option");
+				break;
+			}
+		}
+		while(!quit);
+	}
+
+	/**
+	 * Displays the full menu of options for a StaffMember or a FullMember 
+	 * 
+	 * @return void
+	 */
+	public void fullMenu() {
+		String input = null;
+		boolean quit = false;
+		do{
+			System.out.println("Full Menu");
+			System.out.println("----------------");
+			System.out.println("1. View Stock Catalogue");
+			System.out.println("2. Change Password");
+			System.out.println("3. Request a Reservation");
+			System.out.println("4. Show your Reservations");
+			System.out.println("5. Check your fines");
+			System.out.println("6. Change your account details");
+			System.out.println("0. Logout");
+			System.out.println("\nEnter an option");
+			
+			try{
+				input = in.readLine();
+			}
+			catch (IOException e){
+				System.err.println("Error : " + e);
+			}
+			
+			
+			switch (input){ 
+			case "1":
+				viewCatalogue();
+				break;
+			case "2":
+				changePassword();
+				break;
+			case "3":
+				requestReservation();
+				break;
+			case "4":
+				showReservations();
+				break;
+			case "5": 
+				checkFines();
+				break;
+			case "6": 
+				editUser();
+				break;
+			case "0":
+				this.logout = true;
+				quit = true;
+				break;
+			default:
+				System.out.println("Please enter a valid option");
+				break;
+			}
+		}
+		while(!quit);
+	}
+	
+
+	/**
+	 * Menu for managing stock
+	 * 
+	 * @return void
+	 */
+	public void manageStock(){
+		String input = null;
+		boolean quit = false;
+		do{
+			System.out.println("Manage Stock");
+			System.out.println("----------------");
+			System.out.println("1. View all items");
+			System.out.println("2. Add an item");
+			System.out.println("3. Remove an item");
+			System.out.println("0. Cancel");
+			System.out.println("\nEnter an option");
+			
+			try{
+				input = in.readLine();
+			}
+			catch (IOException e){
+				System.err.println("Error : " + e);
+			}
+			
+			
+			switch (input){ 
+			case "1":
+				viewCatalogue();
+				break;
+			case "2":
+				addStockMenu();
+				break;
+			case "3":
+				removeStockMenu();
+				break;
+			case "0":
+				quit = true;
+				break;
+			default:
+				System.out.println("Please enter a valid option");
+				break;
+			}
+		}
+		while(!quit);
+	}
+
+	
+	/**
+	 * Menu for managing users
+	 * 
+	 * @return void
+	 */
+	public void manageUsers(){
+		String input = null;
+		boolean quit = false;
+		do{
+			System.out.println("Manage Users");
+			System.out.println("----------------");
+			System.out.println("1. View all users");
+			System.out.println("2. Add a user");
+			System.out.println("3. Remove a user");
+			System.out.println("0. Cancel");
+			System.out.println("\nEnter an option");
+			
+			try{
+				input = in.readLine();
+			}
+			catch (IOException e){
+				System.err.println("Error : " + e);
+			}
+			
+			switch (input){ 
+			case "1":
+				viewUsers();
+				break;
+			case "2":
+				addUserMenu();
+				break;
+			case "3":
+				removeUserMenu();
+				break;
+			case "0":
+				quit = true;
+				break;
+			default:
+				System.out.println("Please enter a valid option");
+				break;
+			}
+		}
+		while(!quit);
+	}
+
+
+	/**
+	 * Menu for managing reports
+	 * 
+	 * @return void
+	 */
+	public void manageReports(){
+		String input = null;
+		boolean quit = false;
+		do{
+			System.out.println("Manage Reports");
+			System.out.println("----------------");
+			System.out.println("1. View users");
+			System.out.println("2. View stock");
+			System.out.println("3. View loans");
+			System.out.println("0. Cancel");
+			System.out.println("\nEnter an option");
+			
+			try{
+				input = in.readLine();
+			}
+			catch (IOException e){
+				System.err.println("Error : " + e);
+			}
+			
+			
+			switch (input){ 
+			case "1":
+				viewUsers();
+				break;
+			case "2":
+				viewCatalogue();
+				break;
+			case "0":
+				quit = true;
+				break;
+			default:
+				System.out.println("Please enter a valid option");
+				break;
+			}
+		}
+		while(!quit);
+	}
+
+
+	/**
+	 * Loans menu
+	 * @return void
+	 */
+	public void manageLoans() {
 		String input = null;
 		boolean quit = false;
 		do{
@@ -215,7 +515,14 @@ public class LearningCenter {
 		while(!quit);
 	}
 	
-	private void removeLoan() {
+	/**
+	 * Returns a stock item to the system and removes the loan 
+	 * If the item is late a fine will be created and the users
+	 * account will be suspended, the loan will still be removed
+	 * 
+	 * @return void
+	 */
+	public void removeLoan() {
 		String input = askFor("the username of the user that the item "
 				+ "was loaned to");
 		
@@ -238,7 +545,6 @@ public class LearningCenter {
 		Iterator<Loan> it = b.getUserLoans().iterator();
 		while(it.hasNext()){
 			Loan l = it.next();
-			
 			System.out.println(l.toString());
 			System.out.println("----------------");
 			
@@ -250,7 +556,6 @@ public class LearningCenter {
 			Loan l = it.next();
 			
 			if(l.getLoanID().equals(input)){
-				System.out.println("Press enter to continue, or enter 0 to cancel the loan");
 				String i = askFor("anything to continue, or enter 0 to cancel the loan");
 				
 				switch(i){
@@ -258,6 +563,15 @@ public class LearningCenter {
 					System.out.println("Cancelled");
 					break;
 				default:
+					int days = l.daysSince();
+					if(days > 10){						
+						days = days - 10;				
+						if(days > 0){
+							double fine = days * 0.5;
+							b.setFine(fine);
+							System.out.println("Fine set of " + String.valueOf(fine));
+						}
+					}
 					b.getUserLoans().remove(l);
 					Stock item = getStockByID(l.getStockID());
 					item.setLoanedTo(null);
@@ -273,7 +587,7 @@ public class LearningCenter {
 	 * 
 	 * @return void
 	 */
-	private void addLoan() {		
+	public void addLoan() {		
 		String input = askFor("the username of the user that the item "
 				+ "is being loaned to");
 		User u = getUserByUsername(input);
@@ -289,7 +603,11 @@ public class LearningCenter {
 			System.out.println("This user can not borrow items");
 			return;
 		}
-		if(b.getBorrowingQuota() <= b.getUserLoans().size()){
+		else if(b.getIsSuspended()){
+			System.out.println("This user is suspended until they pay any outstanding fines");
+			return;
+		}
+		else if(b.getBorrowingQuota() <= b.getUserLoans().size()){
 			System.out.println("Users borrowing quota reached");
 			return;
 		}
@@ -336,7 +654,7 @@ public class LearningCenter {
 	 * 
 	 * @return void
 	 */
-	private void viewLoans() {
+	public void viewLoans() {
 		Iterator<User> uIt = allUsers.iterator();
 		Borrower b = null;
 		boolean found = false;
@@ -368,152 +686,11 @@ public class LearningCenter {
 	}
 	
 	/**
-	 * checks if the user is a borrower, if so returns the user as a borrower
-	 * @return Borrower object
-	 */
-	public Borrower isBorrower(User u){
-		if(u instanceof Borrower){
-			return (Borrower) u;
-		}
-		
-		return null;
-	}
-	
-	/**
-	 * Menu for managing stock
+	 * Menu for removing stock items
 	 * 
 	 * @return void
 	 */
-	private void manageStock(){
-		String input = null;
-		boolean quit = false;
-		do{
-			System.out.println("Manage Stock");
-			System.out.println("----------------");
-			System.out.println("1. View all items");
-			System.out.println("2. Add an item");
-			System.out.println("3. Remove an item");
-			System.out.println("0. Cancel");
-			System.out.println("\nEnter an option");
-			
-			try{
-				input = in.readLine();
-			}
-			catch (IOException e){
-				System.err.println("Error : " + e);
-			}
-			
-			
-			switch (input){ 
-			case "1":
-				viewCatalogue();
-				break;
-			case "2":
-				addStockMenu();
-				break;
-			case "3":
-				removeStockMenu();
-				break;
-			case "0":
-				quit = true;
-				break;
-			default:
-				System.out.println("Please enter a valid option");
-				break;
-			}
-		}
-		while(!quit);
-	}
-	
-	/**
-	 * Menu for managing users
-	 * 
-	 * @return void
-	 */
-	private void manageUsers(){
-		String input = null;
-		boolean quit = false;
-		do{
-			System.out.println("Manage Users");
-			System.out.println("----------------");
-			System.out.println("1. View all users");
-			System.out.println("2. Add a user");
-			System.out.println("3. Remove a user");
-			System.out.println("0. Cancel");
-			System.out.println("\nEnter an option");
-			
-			try{
-				input = in.readLine();
-			}
-			catch (IOException e){
-				System.err.println("Error : " + e);
-			}
-			
-			switch (input){ 
-			case "1":
-				viewUsers();
-				break;
-			case "2":
-				addUserMenu();
-				break;
-			case "3":
-				removeUserMenu();
-				break;
-			case "0":
-				quit = true;
-				break;
-			default:
-				System.out.println("Please enter a valid option");
-				break;
-			}
-		}
-		while(!quit);
-	}
-	
-	/**
-	 * Menu for managing reports
-	 * 
-	 * @return void
-	 */
-	private void manageReports(){
-		String input = null;
-		boolean quit = false;
-		do{
-			System.out.println("Manage Reports");
-			System.out.println("----------------");
-			System.out.println("1. View users");
-			System.out.println("2. View stock");
-			System.out.println("3. View loans");
-			System.out.println("0. Cancel");
-			System.out.println("\nEnter an option");
-			
-			try{
-				input = in.readLine();
-			}
-			catch (IOException e){
-				System.err.println("Error : " + e);
-			}
-			
-			
-			switch (input){ 
-			case "1":
-				viewUsers();
-				break;
-			case "2":
-				viewCatalogue();
-				break;
-			case "0":
-				quit = true;
-				break;
-			default:
-				System.out.println("Please enter a valid option");
-				break;
-			}
-		}
-		while(!quit);
-	}
-
-	private void removeStockMenu() {
+	public void removeStockMenu() {
 		String input = null;
 		boolean quit = false;
 		Stock s = null;
@@ -549,7 +726,13 @@ public class LearningCenter {
 		while(!quit);
 	}
 
-	private Stock getStockByID(String input) {
+	/**
+	 * Searches through the array list for a stock item with the ID you're searching for
+	 * 
+	 * @param input
+	 * @return
+	 */
+	public Stock getStockByID(String input) {
 
 		Iterator<Stock> it = allStock.iterator();
 		
@@ -564,10 +747,133 @@ public class LearningCenter {
 		return null;
 	}
 
-	private void addStockMenu() {
+	
+	/**
+	 * 
+	 * asks for the details for adding a stock item to the system
+	 * 
+	 * @param string type of stock, class names only accepted
+	 * @return Stock the created stock item
+	 */
+	public Stock getStockDetails(String type){
+		
+		String[] details = new String[10]; 
+		
+		if(!type.equals("Book") && !type.equals("Journal") && !type.equals("CD") && !type.equals("Video")){
+			return null;
+		}
+		details[0] = askFor("the stock item's title");
+		if(details[0].length() < 4)
+		{
+			System.out.println("Item title too short");
+			return null;
+		}
+		
+		details[1] = askFor("the cost of " + details[0] + " as a number to two decimal places");
+		if(!isNumeric(details[1]))
+		{
+			System.out.println("Item cost must be a numeric");
+			return null;
+		}
+		
+		details[2] = askFor("publisher");
+		
+		switch(type){
+		case "Book":
+			details[3] = askFor("the subject area of this book");
+			if(details[3].length() < 1){
+				System.out.println("Your entry was too short");
+				return null;
+			}
+			
+			details[4] = askFor("the ISBN of this book");
+			if(details[4].length() < 1){
+				System.out.println("Your entry was too short");
+				return null;
+			}
+			
+			details[5] = askFor("the number of pages in this book");
+			if(!isNumeric(details[5])){
+				System.out.println("Entry was not numeric");
+				return null;
+			}
+			
+			details[6] = askFor("the author of the book");
+			return new Book(details[0], Double.parseDouble(details[1]), details[2], details[3], details[4], Integer.parseInt(details[5]), details[6]);
+		case "Journal":
+			details[3] = askFor("the subject area of the journal");
+			if(details[3].length() < 1){
+				System.out.println("Your entry was too short");
+				return null;
+			}
+			
+			details[4] = askFor("the ISSN of this journal");
+			if(details[4].length() < 1){
+				System.out.println("Your entry was too short");
+				return null;
+			}
+			
+			details[5] = askFor("the number of pages in this journal");
+			if(!isNumeric(details[5])){
+				System.out.println("Entry was not numeric");
+				return null;
+			}
+			
+			details[6] = askFor("issue number");
+			details[7] = askFor("date of issue");
+			
+			return new Journal(details[0], Double.parseDouble(details[1]), details[2], details[3], details[4], Integer.parseInt(details[5]), details[6], details[7]);
+		case "CD":
+			details[3] = askFor("the run time");
+			if(!isNumeric(details[3])){
+				System.out.println("Input was not numeric");
+				return null;
+			}
+			
+			details[4] = askFor("case type");
+			
+			if(details[4].length() < 1){
+				System.out.println("Input was too short");
+				return null;
+			}
+			
+			details[5] = askFor("the CD type");
+			details[6] = askFor("the CD's artist");
+			return new CD(details[0], Double.parseDouble(details[1]), details[2], Double.parseDouble(details[3]), details[4], details[5], details[6]);
+		case "Video":
+			details[3] = askFor("the run time");
+			if(!isNumeric(details[3])){
+				System.out.println("Input was not numeric");
+				return null;
+			}
+			
+			details[4] = askFor("case type");
+
+			if(details[4].length() < 1){
+				System.out.println("Input was too short");
+				return null;
+			}
+			
+			details[5] = askFor("the video genre");
+			
+			details[6] = askFor("the video format");
+			return new Video(details[0], Double.parseDouble(details[1]), details[2], Double.parseDouble(details[3]), details[4], details[5], details[6]);
+
+		}
+		return null;
+	
+	}
+	
+	/**
+	 * Menu to add stock items, loads them into the allStock array list
+	 * 
+	 * @return void
+	 */
+	public void addStockMenu() {
 		String input = null;
+		Stock s = null;
 		boolean quit = false;
-		do{
+		while(!quit){
 			System.out.println("Select type of stock to add");
 			System.out.println("----------------");
 			System.out.println("1. Book");
@@ -577,35 +883,52 @@ public class LearningCenter {
 			System.out.println("0. Cancel");
 			System.out.println("\nEnter an option");
 			
-			try{
-				input = in.readLine();
-			}
-			catch (IOException e){
-				System.err.println("Error : " + e);
-			}
+			input = getInput();
 			
 			switch (input){ 
 			case "1":
+				System.out.println("You have selected: Book");
+				System.out.println("Please enter the details for your book");
+
+				s = getStockDetails("Book");
+					
 				break;
 			case "2":
+				System.out.println("You have selected: Journal");
+				System.out.println("Please enter the details for your journal");
+				s = getStockDetails("Journal");
 				break;
 			case "3":
+				System.out.println("You have selected: CD");
+				System.out.println("Please enter the details for your CD");
+				s = getStockDetails("CD");
 				break;
 			case "4":
+				System.out.println("You have selected: Video");
+				System.out.println("Please enter the details for your video");
+				s = getStockDetails("Video");
 				break;
 			case "0":
 				quit = true;
-				break;
+				return;
 			default:
 				System.out.println("Please enter a valid option");
 				break;
 			}
+			if(s != null){
+				try{
+					allStock.add(s);
+					System.out.println("Stock added successfully");	
+				}
+				catch(Exception e){
+					System.out.println("Item add failed");
+				}
+			}
+			s = null;
 		}
-		while(!quit);
 	}
 	
-	
-	private void removeUserMenu() {
+	public void removeUserMenu() {
 		String input = null;
 		boolean quit = false;
 		User u = null;
@@ -651,7 +974,7 @@ public class LearningCenter {
 	 * 
 	 * @return String[] All of those details in an array 
 	 */
-	private String[] getUserDetails(){
+	public String[] getUserDetails(){
 		String[] details = new String[10]; 
 		
 		details[0] = askFor("username");
@@ -673,7 +996,7 @@ public class LearningCenter {
 	 * 
 	 * @return void
 	 */
-	private void addUserMenu() {
+	public void addUserMenu() {
 		String input = null;
 		boolean quit = false;
 		String[] details = null;
@@ -836,21 +1159,11 @@ public class LearningCenter {
 		while(!quit);
 	}
 	
-	/**
-	 * Asks the users for a thing
-	 * @param thing to ask the user for
-	 * @return user input String
-	 */
-	private String askFor(String thing){
-		System.out.println("Please enter " + thing);
-		return getInput();
-	}
-	
 	/** 
 	 * Gets user input
 	 * @return
 	 */
-	private String getInput(){
+	public String getInput(){
 		String temp = null;
 		try{
 			temp = in.readLine();
@@ -860,13 +1173,23 @@ public class LearningCenter {
 		}
 		return temp;
 	};
-	
+		
+	/**
+	 * Asks the users for a thing
+	 * @param thing to ask the user for
+	 * @return user input String
+	 */
+	public String askFor(String thing){
+		System.out.println("Please enter " + thing);
+		return getInput();
+	}
+
 	/**
 	 * Displays all the users
 	 * 
 	 * @return void
 	 */
-	private void viewUsers() {
+	public void viewUsers() {
 		Iterator<User> uIt = allUsers.iterator();
 		
 		System.out.println("--------------------------");
@@ -888,107 +1211,39 @@ public class LearningCenter {
 	}
 
 	/**
-	 * Menu for CasualUsers
-	 * @return void
-	 */
-	private void casualMenu() {
-		String input = null;
-		boolean quit = false;
-		do{
-			System.out.println("Casual User Menu");
-			System.out.println("----------------");
-			System.out.println("1. View Stock Catalogue");
-			System.out.println("2. Change Password");
-			System.out.println("0. Logout");
-			System.out.println("\nEnter an option");
-			
-			try{
-				input = in.readLine();
-			}
-			catch (IOException e){
-				System.err.println("Error : " + e);
-			}
-			
-			
-			switch (input){ 
-			case "1":
-				viewCatalogue();
-				break;
-			case "2":
-				changePassword();
-				break;
-			case "0":
-				this.logout = true;
-				quit = true;
-				break;
-			default:
-				System.out.println("Please enter a valid option");
-				break;
-			}
-		}
-		while(!quit);
-	}
-	
-	/**
-	 * Displays the full menu of options for a staffmember or a fullmember user
-	 * @return void
-	 */
-	private void fullMenu() {
-		String input = null;
-		boolean quit = false;
-		do{
-			System.out.println("Full Menu");
-			System.out.println("----------------");
-			System.out.println("1. View Stock Catalogue");
-			System.out.println("2. Change Password");
-			System.out.println("3. Request a Reservation");
-			System.out.println("4. Show your Reservations");
-			System.out.println("5. Check your fines");
-			System.out.println("0. Logout");
-			System.out.println("\nEnter an option");
-			
-			try{
-				input = in.readLine();
-			}
-			catch (IOException e){
-				System.err.println("Error : " + e);
-			}
-			
-			
-			switch (input){ 
-			case "1":
-				viewCatalogue();
-				break;
-			case "2":
-				changePassword();
-				break;
-			case "3":
-				requestReservation();
-				break;
-			case "4":
-				showReservations();
-				break;
-			case "5": 
-				checkFines(activeUser.getUserID());
-				break;
-			case "0":
-				this.logout = true;
-				quit = true;
-				break;
-			default:
-				System.out.println("Please enter a valid option");
-				break;
-			}
-		}
-		while(!quit);
-	}
-
-	/**
 	 * Shows all the fines a user may have, works off of a userID rather than a user object
 	 * @param userID
 	 */
-	private void checkFines(String userID) {
-		
+	public void checkFines() {
+		Borrower b = isBorrower(activeUser);
+		boolean quit = false;
+		if(b.getFine() > 0){
+			while(!quit){
+				System.out.println("You have fines of £" + b.getFine());
+				System.out.println("1. Pay in full");
+				System.out.println("0. Quit");
+				
+				String input = getInput();
+				
+				switch (input){ 
+				case "1":
+					b.setFine(0);
+					b.setIsSuspended(false);
+					quit = true;
+					break;
+				case "0":
+					quit = true;
+					break;
+				default:
+					System.out.println("Invalid input");
+					break;
+				}
+			}
+
+		}
+		else{
+			System.out.println("User has no fines");
+		}
 	}
 	
 	/**
@@ -996,7 +1251,7 @@ public class LearningCenter {
 	 * @param String userID
 	 * @return User
 	 */
-	private User getUserByID(String userID){
+	public User getUserByID(String userID){
 		
 		Iterator<User> uIt = allUsers.iterator();
 		
@@ -1018,7 +1273,7 @@ public class LearningCenter {
 	 * @param String username
 	 * @return User
 	 */
-	private User getUserByUsername(String username){
+	public User getUserByUsername(String username){
 		
 		Iterator<User> uIt = allUsers.iterator();
 		
@@ -1034,10 +1289,42 @@ public class LearningCenter {
 	}
 	
 	/**
+	 * checks if the user is a borrower, if so returns the user as a borrower
+	 * @return Borrower object
+	 */
+	public Borrower isBorrower(User u){
+		if(u instanceof Borrower){
+			return (Borrower) u;
+		}
+		
+		return null;
+	}
+	
+	/**
+	 * Basic isNumeric helper function for a string 
+	 * 
+	 * @param str
+	 * @return boolean
+	 */
+	public static boolean isNumeric(String str)  
+	{  
+	  try  
+	  {  
+	    @SuppressWarnings("unused")
+		double d = Double.parseDouble(str);  
+	  }  
+	  catch(NumberFormatException nfe)  
+	  {  
+	    return false;  
+	  }  
+	  return true;  
+	}
+
+	/**
 	 * Gets all the reservations from a user, if they have any
 	 * @param user
 	 */
-	private void showReservations(User user){
+	public void showReservations(User user){
 		if(activeUser.getUserReservations() == null){
 			System.out.println("-------------------------");
 			System.out.println("User has no reservations." + activeUser.getUsername());
@@ -1061,7 +1348,7 @@ public class LearningCenter {
 	 * 
 	 * @return void
 	 */
-	private void showReservations(){
+	public void showReservations(){
 		if(activeUser.getUserReservations() == null){
 			System.out.println("-------------------------");
 			System.out.println("User has no reservations.");
@@ -1087,7 +1374,7 @@ public class LearningCenter {
 	 * 
 	 * @return void
 	 */
-	private void requestReservation() {
+	public void requestReservation() {
 		String input = null;
 		boolean quit = false;
 		do{
@@ -1147,7 +1434,7 @@ public class LearningCenter {
 	 * 
 	 * @return void
 	 */
-	private void changePassword() {
+	public void changePassword() {
 		String oldPassword = null;
 		String confirmPassword = null;
 		String newPassword = null;
@@ -1155,20 +1442,10 @@ public class LearningCenter {
 		boolean finished = false;
 		while(!finished){
 			System.out.println("Enter new password");
-			try{
-				newPassword = in.readLine();
-			}
-			catch (IOException e){
-				System.err.println("Error : " + e);
-			}	
-			
+			newPassword = getInput();
+	
 			System.out.println("Confirm new password");
-			try{
-				confirmPassword = in.readLine();
-			}
-			catch (IOException e){
-				System.err.println("Error : " + e);
-			}	
+			confirmPassword = getInput();
 			
 			if(confirmPassword.equals(newPassword) && !newPassword.equals(null) &&!confirmPassword.equals(null)){
 				System.out.println("New password matches");
@@ -1179,12 +1456,7 @@ public class LearningCenter {
 					System.out.println("Enter old password");
 					System.out.println(attempts + " attempts remaining");
 					
-					try{
-						oldPassword = in.readLine();
-					}
-					catch (IOException e){
-						System.err.println("Error : " + e);
-					}
+					oldPassword = getInput();
 					
 					if(oldPassword.equals(this.activeUser.getPassword())){
 						activeUser.setPassword(newPassword);
@@ -1203,13 +1475,79 @@ public class LearningCenter {
 		}
 		
 	}
+	
+	/**
+	 * Allows the logged in user to edit their general user details - username, 
+	 * first name, and surname. Password is handled by the changePassword() 
+	 * method of this class
+	 * 
+	 * @return void
+	 */
+	public void editUser(){
+		boolean quit = false;
+		
+		while(!quit){
+			System.out.println("Select a field to change about your user account");
+			System.out.println("1. Username");
+			System.out.println("2. First name");
+			System.out.println("3. Surname");
+			System.out.println("0. Quit");
+			String input = askFor(" an option");
+			
+			switch(input){
+			case "1":
+				input = askFor("your new username");
+				if(input.length() > 0){
+					activeUser.setUsername(input);
+					System.out.println("Edit made");
+				}
+				else
+				{
+					System.out.println("Input invalid");
+				}
+				break;
+			case "2":
+				input = askFor("your new username");
+				if(input.length() > 0){
+					activeUser.setFirstname(input);
+					System.out.println("Edit made");
 
+				}
+				else
+				{
+					System.out.println("Input invalid");
+				}
+				break;
+			case "3":
+				input = askFor("your new username");
+				if(input.length() > 0){
+					activeUser.setSurname(input);					
+					System.out.println("Edit made");
+
+				}
+				else
+				{
+					System.out.println("Input invalid");
+				}
+				break;
+			case "0": 
+				quit = true;
+				break;
+			default:
+				System.out.println("Input invalid");
+	
+			}
+
+		}
+		
+	}
+	
 	/**
 	 * Shows the catalogue of all stock in the system
 	 * 
 	 * @return void
 	 */
-	private void viewCatalogue() {
+	public void viewCatalogue() {
 		Iterator<Stock> stockIt = allStock.iterator();
 		
 		System.out.println("--------------------------");
@@ -1229,7 +1567,32 @@ public class LearningCenter {
 				System.err.println("Error : " + e);
 		}	
 	}
-
+	
+	/**
+	 * Search all the items by name and list an item if found
+	 * 
+	 * @return void
+	 */
+	public void searchCatalogue(){
+		
+	}
+	
+	/**
+	 * show the logins for a user 
+	 * @param u
+	 */
+	public void viewLogin(User u){
+		System.out.println("Logins for user " + u.getUsername());
+		System.out.println("-------------------------");
+		Iterator<LoginRecord> it = u.getLoginRecords().iterator();
+		
+		while(it.hasNext()){
+			LoginRecord l = it.next();
+			System.out.println(l.toString());
+			System.out.println("-------------------------");	
+		}
+	}
+	
 	/**
 	 * Login - asks the user for a username and password until they are successfully logged in to the system
 	 * 
@@ -1299,24 +1662,22 @@ public class LearningCenter {
 	}
 	
 	/**
-	 * Populates the all users ArrayList
+	 * Populates the all users ArrayList from the serialised file allUsers
 	 */
+	@SuppressWarnings("unchecked")
 	public void populateUsers(){
-		allUsers.add(
-				new CasualUser("casualuser", "password", "John", "Doe", "44 Big Street", "Big Town", 
-						"AA1 AA2", "01/01/1990")
-				);
-		allUsers.add(
-				new Administrator("admin", "password", "Admin", "Admin", "2001")
-				);
-		allUsers.add(
-				new StaffMember("staffmember", "password", "John", "Doe", StaffMember.getNextID(),
-						"staffmember@glencaldy.com", "100")
-				);
-		allUsers.add(
-				new FullMember("fullmember", "password", "John", "Doe", "44 Big Street", "Big Town", 
-						"AA1 AA2", "01/01/1990")
-				);
+//        try{
+//            FileInputStream fis = new FileInputStream("allUsers");
+//            ObjectInputStream ois = new ObjectInputStream(fis);
+//            this.allUsers = (ArrayList<User>) ois.readObject();
+//            ois.close();
+//            fis.close();
+//        }
+//        catch(Exception e){
+//             e.printStackTrace();
+//             return;
+//         };
+		allUsers.add(new Administrator("admin", "admin", "admin", "admin", "admin"));
 	}
 	
 	/**
