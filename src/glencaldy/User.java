@@ -32,13 +32,18 @@ public abstract class User implements Serializable {
 		this.surname = surname;
 	}
 	
+	public void recordLogin(){
+		LoginRecord lr = new LoginRecord(this.userID);
+		lastLogin = lr;
+		loginRecords.add(lastLogin);
+	}
+	
 	public boolean login(String un, String pw){
 		
 		if(un == this.userID & pw == this.password){
 			
 			LoginRecord lr = new LoginRecord(this.userID);
 			lastLogin = lr;
-			
 			loginRecords.add(lastLogin);
 			
 			return true;

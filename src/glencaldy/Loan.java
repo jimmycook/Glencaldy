@@ -1,10 +1,12 @@
 package glencaldy;
 
+import java.io.Serializable;
 import java.util.Date;
+
 import org.joda.time.Days;
 import org.joda.time.DateTime;
 
-public class Loan {
+public class Loan implements Serializable {
 	private static int nextID = 8001;
 	private String loanID;
 	private String stockID;

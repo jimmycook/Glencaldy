@@ -1,6 +1,8 @@
 package glencaldy;
 
-public abstract class Stock {
+import java.io.Serializable;
+
+public abstract class Stock implements Serializable{
 	
 	private String stockID;
 	private String title;

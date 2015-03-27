@@ -1,8 +1,9 @@
 package glencaldy;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class LoginRecord {
+public class LoginRecord implements Serializable{
 	
 	private String computerID = "1"; //Hard coded for prototype
 	private Date date = new Date();

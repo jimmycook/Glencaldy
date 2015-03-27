@@ -10,8 +10,6 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-
-
 /**
  * 
  * Controller class for the Glencaldy Learning Center application
@@ -58,28 +56,6 @@ public class LearningCenter {
 		System.out.println("System shutting down");
 	}
 	
-	/**
-	 * Logs the current user out and serialises the allUsers ArrayList
-	 * 
-	 * @return void
-	 */
-	public void logout() {
-		this.activeUser = null;
-		this.logout = false;
-		
-		try{
-			FileOutputStream fos= new FileOutputStream("allUsers");
-	        ObjectOutputStream oos= new ObjectOutputStream(fos);
-			oos.writeObject(this.allUsers);
-			oos.close();
-	        fos.close();
-		}
-		catch(IOException ioe)
-		{
-			ioe.printStackTrace();
-	    }
-	}
-
 	/**
 	 * displays the right type of menu for the users that is currently logged in
 	 * @return void
@@ -248,6 +224,8 @@ public class LearningCenter {
 			System.out.println("1. View Stock Catalogue");
 			System.out.println("2. Change Password");
 			System.out.println("3. Edit account details");
+			System.out.println("4. Search for an item");
+			System.out.println("5. View your login history");
 			System.out.println("0. Logout");
 			System.out.println("\nEnter an option");
 			
@@ -268,6 +246,12 @@ public class LearningCenter {
 				break;
 			case "3": 
 				editUser();
+			case "4": 
+				searchCatalogue();
+				break;
+			case "5": 
+				viewLogins(activeUser);
+				break;
 			case "0":
 				this.logout = true;
 				quit = true;
@@ -288,6 +272,8 @@ public class LearningCenter {
 	public void fullMenu() {
 		String input = null;
 		boolean quit = false;
+		Borrower b = isBorrower(activeUser);
+
 		do{
 			System.out.println("Full Menu");
 			System.out.println("----------------");
@@ -297,6 +283,9 @@ public class LearningCenter {
 			System.out.println("4. Show your Reservations");
 			System.out.println("5. Check your fines");
 			System.out.println("6. Change your account details");
+			System.out.println("7. Search for an item");
+			System.out.println("8. View your login history");
+			System.out.println("9. View your active loans");
 			System.out.println("0. Logout");
 			System.out.println("\nEnter an option");
 			
@@ -327,6 +316,15 @@ public class LearningCenter {
 			case "6": 
 				editUser();
 				break;
+			case "7": 
+				searchCatalogue();
+				break;
+			case "8": 
+				viewLogins(b);
+				break;
+			case "9":
+				showLoans(b);
+				break;
 			case "0":
 				this.logout = true;
 				quit = true;
@@ -354,6 +352,7 @@ public class LearningCenter {
 			System.out.println("1. View all items");
 			System.out.println("2. Add an item");
 			System.out.println("3. Remove an item");
+			System.out.println("4. Edit an item");
 			System.out.println("0. Cancel");
 			System.out.println("\nEnter an option");
 			
@@ -375,6 +374,9 @@ public class LearningCenter {
 			case "3":
 				removeStockMenu();
 				break;
+			case "4":
+				editStock();
+				break;
 			case "0":
 				quit = true;
 				break;
@@ -386,7 +388,79 @@ public class LearningCenter {
 		while(!quit);
 	}
 
+	/**
+	 * Get a stock item by ID and then edit it's base attributes
+	 * 
+	 * @return void
+	 */
+	public void editStock() {
+		String i = askFor("the ID of the stock item to be edited");
+		Stock s = getStockByID(i);
+		
+		if(s != null){
+			System.out.println("Item found");
+		}
+		else{
+			System.out.println("Item not found");
+		}
+		
+		boolean quit = false;
+		
+		while(!quit){
+			System.out.println("Select a field to change about your user account");
+			System.out.println("1. Title");
+			System.out.println("2. Cost");
+			System.out.println("3. Publisher");
+			System.out.println("0. Quit");
+			String input = askFor(" an option");
+			
+			switch(input){
+			case "1":
+				input = askFor("stock item title");
+				if(input.length() > 0){
+					s.setTitle(input);
+					System.out.println("Edit made");
+				}
+				else
+				{
+					System.out.println("Input invalid");
+				}
+				break;
+			case "2":
+				input = askFor("stock item cost");
+				if(input.length() > 0 && isNumeric(input)){
+					s.setCost(Double.parseDouble(input));
+					System.out.println("Edit made");
+
+				}
+				else
+				{
+					System.out.println("Input invalid");
+				}
+				break;
+			case "3":
+				input = askFor("stock item publisher");
+				if(input.length() > 0){
+					s.setPublisher(input);					
+					System.out.println("Edit made");
+
+				}
+				else
+				{
+					System.out.println("Input invalid");
+				}
+				break;
+			case "0": 
+				quit = true;
+				break;
+			default:
+				System.out.println("Input invalid");
 	
+			}
+
+		}
+	}
+
 	/**
 	 * Menu for managing users
 	 * 
@@ -442,11 +516,12 @@ public class LearningCenter {
 		String input = null;
 		boolean quit = false;
 		do{
-			System.out.println("Manage Reports");
+			System.out.println("Reports");
 			System.out.println("----------------");
 			System.out.println("1. View users");
 			System.out.println("2. View stock");
 			System.out.println("3. View loans");
+			System.out.println("4. View logins");
 			System.out.println("0. Cancel");
 			System.out.println("\nEnter an option");
 			
@@ -464,6 +539,11 @@ public class LearningCenter {
 				break;
 			case "2":
 				viewCatalogue();
+				break;
+			case "3":
+				viewLoans();
+			case "4":
+				viewLogins();
 				break;
 			case "0":
 				quit = true;
@@ -504,8 +584,11 @@ public class LearningCenter {
 			case "3":
 				removeLoan();
 				break;
+			case "4":
+				viewLogins();
+				break;
 			case "0":
-				
+				quit = true;
 				break;
 			default:
 				System.out.println("Invalid input");
@@ -660,7 +743,7 @@ public class LearningCenter {
 		boolean found = false;
 		System.out.println("All loans");
 		System.out.println("----------------");
-
+		
 		while(uIt.hasNext()){
 			b = null;
 			User u = uIt.next();
@@ -668,14 +751,15 @@ public class LearningCenter {
 			if(b != null){
 				ArrayList<Loan> lList = b.getUserLoans();
 				Iterator<Loan> lIt = lList.iterator(); 
-				while(lIt.hasNext()){
-					Loan l = lIt.next();
-					System.out.println(l.toString());
-					System.out.println("User\t\t: " + b.getUsername());
-					System.out.println("----------------");
-					found = true;
+				if(b.getUserLoans().size() > 0){
+					while(lIt.hasNext()){
+						Loan l = lIt.next();
+						System.out.println(l.toString());
+						System.out.println("User\t\t: " + b.getUsername());
+						System.out.println("----------------");
+						found = true;
+					}
 				}
-				
 			}
 		}
 		if(!found){
@@ -685,6 +769,21 @@ public class LearningCenter {
 		getInput();
 	}
 	
+	public void showLoans(Borrower b){
+		if(b.getUserLoans().size() < 1){
+			System.out.println("No loans for users " + b.getUsername());
+			return;
+		}
+		
+		Iterator<Loan> it = b.getUserLoans().iterator();
+		
+		System.out.println("Loans for user " + b.getUsername());
+		System.out.println("----------------");
+		while(it.hasNext()){
+			System.out.println(it.next().toString());
+			System.out.println("----------------");
+		}
+	}
 	/**
 	 * Menu for removing stock items
 	 * 
@@ -696,7 +795,7 @@ public class LearningCenter {
 		Stock s = null;
 		
 		do{
-			System.out.println("Enter the username of the user to be removed, or 0 to cancel");
+			System.out.println("Enter the ID of the stock to be removed, or 0 to cancel");
 			System.out.println("----------------");
 			
 			input = getInput();
@@ -1574,14 +1673,44 @@ public class LearningCenter {
 	 * @return void
 	 */
 	public void searchCatalogue(){
+		String i = askFor("the title of the item you want to view");
+
+		Stock item = findItem(i);
 		
+		if(item != null){
+			System.out.println("Item found");
+			System.out.println(item.toString());
+		}
+		else{
+			System.out.println("Item not found");
+		}
+	}
+	
+	/**
+	 * Returns the stock object based on a title string, or returns null
+	 * @return Stock item
+	 */
+	public Stock findItem(String i){
+		Iterator<Stock> it = allStock.iterator();
+		
+		while(it.hasNext()){
+			Stock item = it.next();
+			if(item.getTitle().equals(i)){
+				return item;
+			}
+		}
+		return null;
 	}
 	
 	/**
 	 * show the logins for a user 
 	 * @param u
 	 */
-	public void viewLogin(User u){
+	public void viewLogins(User u){
+		if(u.getLoginRecords().size() < 1){
+			System.out.println("No logins for user " + u.getUsername());
+			return;
+		}
 		System.out.println("Logins for user " + u.getUsername());
 		System.out.println("-------------------------");
 		Iterator<LoginRecord> it = u.getLoginRecords().iterator();
@@ -1593,6 +1722,43 @@ public class LearningCenter {
 		}
 	}
 	
+	/**
+	 * shows all the logins in the system 	
+	 */
+	public void viewLogins(){
+		Iterator<User> it = allUsers.iterator();
+		
+		while(it.hasNext()){
+			User u = it.next();
+			if(u.getLoginRecords().size() > 0){
+				viewLogins(u);
+			}
+		}
+	}
+
+
+	/**
+	 * Logs the current user out and serialises the allUsers ArrayList
+	 * 
+	 * @return void
+	 */
+	public void logout() {
+		this.activeUser = null;
+		this.logout = false;
+		
+		try{
+			FileOutputStream fos= new FileOutputStream("allUsers");
+	        ObjectOutputStream oos= new ObjectOutputStream(fos);
+			oos.writeObject(this.allUsers);
+			oos.close();
+	        fos.close();
+		}
+		catch(IOException ioe)
+		{
+			ioe.printStackTrace();
+	    }
+	}
+
 	/**
 	 * Login - asks the user for a username and password until they are successfully logged in to the system
 	 * 
@@ -1636,6 +1802,7 @@ public class LearningCenter {
 				foundUser = curUser;
 				if(password.equals(curUser.getPassword())){
 					System.out.println("\n\nLogging in as '" + curUser.getUsername() + "'\n\n");
+					curUser.recordLogin();
 					return curUser;
 				}
 				else{
@@ -1666,18 +1833,18 @@ public class LearningCenter {
 	 */
 	@SuppressWarnings("unchecked")
 	public void populateUsers(){
-//        try{
-//            FileInputStream fis = new FileInputStream("allUsers");
-//            ObjectInputStream ois = new ObjectInputStream(fis);
-//            this.allUsers = (ArrayList<User>) ois.readObject();
-//            ois.close();
-//            fis.close();
-//        }
-//        catch(Exception e){
-//             e.printStackTrace();
-//             return;
-//         };
-		allUsers.add(new Administrator("admin", "admin", "admin", "admin", "admin"));
+        try{
+            FileInputStream fis = new FileInputStream("allUsers");
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            this.allUsers = (ArrayList<User>) ois.readObject();
+            ois.close();
+            fis.close();
+        }
+        catch(Exception e){
+             e.printStackTrace();
+             return;
+         };
+//		allUsers.add(new Administrator("admin", "admin", "admin", "admin", "admin"));
 	}
 	
 	/**
