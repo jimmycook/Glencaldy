@@ -22,6 +22,7 @@ public class LearningCenter {
 	private ArrayList<User> allUsers = new ArrayList<User>();
 	private ArrayList<Stock> allStock = new ArrayList<Stock>();
 	private ArrayList<LoginRecord> allLogins = new ArrayList<LoginRecord>();
+	private ArrayList<Loan> returnedLoans = new ArrayList<Loan>();
 	private InputStreamReader converter = new InputStreamReader(System.in);
 	private boolean logout = false;
 	private User activeUser = null;
@@ -570,6 +571,8 @@ public class LearningCenter {
 			System.out.println("1. View loans");
 			System.out.println("2. Loan item");
 			System.out.println("3. Return item");
+			System.out.println("4. View previous loans");
+
 			System.out.println("0. Quit");
 			
 			input = getInput();
@@ -585,7 +588,7 @@ public class LearningCenter {
 				removeLoan();
 				break;
 			case "4":
-				viewLogins();
+				viewPastLoans();
 				break;
 			case "0":
 				quit = true;
@@ -659,8 +662,10 @@ public class LearningCenter {
 					Stock item = getStockByID(l.getStockID());
 					item.setLoanedTo(null);
 					System.out.println("Item returned successfully");
-					break;
-				}
+					l.setUserID(b.getUserID());
+					returnedLoans.add(l);
+					return;
+		}
 			}
 		}
 	}
@@ -765,6 +770,22 @@ public class LearningCenter {
 		if(!found){
 			System.out.println("No loans in system");
 		}
+		System.out.println("Press enter to continue");
+		getInput();
+	}
+	
+	public void viewPastLoans() {
+
+		Iterator<Loan> lIt = returnedLoans.iterator(); 
+		if(returnedLoans.size() > 0){
+			while(lIt.hasNext()){
+				Loan l = lIt.next();
+				System.out.println(l.toString());
+				System.out.println("User\t\t: " + l.getUserID());
+				System.out.println("----------------");
+			}
+		}
+			
 		System.out.println("Press enter to continue");
 		getInput();
 	}
@@ -1492,25 +1513,31 @@ public class LearningCenter {
 						Stock curItem = stockIt.next();
 						
 						if(curItem.getStockID().equals(input)){
-							found = true;
-							System.out.println("Stock item found");
-							System.out.println("-----------------");
-							System.out.println(curItem.toString());
-							System.out.println("-----------------");
-							System.out.println("Reserve this item? (y for yes, to cancel enter anything else)");
+							if(curItem.getReservedBy() == null){
+								System.out.println("Stock item found");
+								System.out.println("-----------------");
+								System.out.println(curItem.toString());
+								System.out.println("-----------------");
+								System.out.println("Reserve this item? (y for yes, to cancel enter anything else)");
+								
+								if(in.readLine().equals("y")){
+									
+									activeUser.getUserReservations().add(new Reservation(input));
+									curItem.setReservedBy(activeUser.getUserID());
+									
+									System.out.println("Reservation created\n");
+									
+									quit = true;
+								}
+								else{
+									System.out.println("Reservation of item cancelled");
+								}
+							}
+							else
+							{
+								System.out.println("Sorry this item has already been reserved");
+							}
 							
-							if(in.readLine().equals("y")){
-								
-								activeUser.getUserReservations().add(new Reservation(input));
-								
-								
-								System.out.println("Reservation created\n");
-								
-								quit = true;
-							}
-							else{
-								System.out.println("Reservation of item cancelled");
-							}
 							
 						}
 					}

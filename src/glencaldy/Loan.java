@@ -10,6 +10,7 @@ public class Loan implements Serializable {
 	private static int nextID = 8001;
 	private String loanID;
 	private String stockID;
+	private String userID;
 	private Date date;
 	
 	Loan(String stockID){
@@ -52,5 +53,13 @@ public class Loan implements Serializable {
 		DateTime today = new DateTime(new Date());
 		DateTime start = new DateTime(this.date);
 		return Days.daysBetween(start, today).getDays();
+	}
+
+	public String getUserID() {
+		return userID;
+	}
+
+	public void setUserID(String userID) {
+		this.userID = userID;
 	}
 }
