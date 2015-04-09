@@ -408,7 +408,7 @@ public class LearningCenter {
 		boolean quit = false;
 		
 		while(!quit){
-			System.out.println("Select a field to change about your user account");
+			System.out.println("Select a field to edit:");
 			System.out.println("1. Title");
 			System.out.println("2. Cost");
 			System.out.println("3. Publisher");
